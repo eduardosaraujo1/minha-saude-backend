@@ -42,22 +42,6 @@ class ShareController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Share $share)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateShareRequest $request, Share $share)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage by code.
      */
     public function destroy($code)

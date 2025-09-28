@@ -38,27 +38,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/documents/{id}/download', [App\Http\Controllers\Api\V1\DocumentController::class, 'download']);
     });
 
-    // Export routes
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/export/generate', function () {
-            return response()->json(['status' => 'not_implemented']);
-        });
-    });
-
     // Trash routes
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/trash', function () {
-            return response()->json(['status' => 'not_implemented']);
-        });
-        Route::get('/trash/{id}', function ($id) {
-            return response()->json(['status' => 'not_implemented']);
-        });
-        Route::post('/trash/{id}/restore', function ($id) {
-            return response()->json(['status' => 'not_implemented']);
-        });
-        Route::post('/trash/{id}/destroy', function ($id) {
-            return response()->json(['status' => 'not_implemented']);
-        });
+        Route::get('/trash', [App\Http\Controllers\Api\V1\TrashController::class, 'index']);
+        Route::get('/trash/{id}', [App\Http\Controllers\Api\V1\TrashController::class, 'show']);
+        Route::post('/trash/{id}/restore', [App\Http\Controllers\Api\V1\TrashController::class, 'restore']);
+        Route::post('/trash/{id}/destroy', [App\Http\Controllers\Api\V1\TrashController::class, 'destroy']);
     });
 
     // Share routes (using /shares for Laravel convention)
@@ -67,5 +52,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/shares', [App\Http\Controllers\Api\V1\ShareController::class, 'index']);
         Route::get('/shares/{code}', [App\Http\Controllers\Api\V1\ShareController::class, 'show']);
         Route::delete('/shares/{code}', [App\Http\Controllers\Api\V1\ShareController::class, 'destroy']);
+    });
+
+    // Export routes
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/export/generate', function () {
+            return response()->json(['status' => 'not_implemented']);
+        });
     });
 });
