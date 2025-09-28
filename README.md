@@ -8,6 +8,13 @@ O projeto propõe a digitalização de documentos de qualquer natureza que envol
 Essa abordagem possibilita um atendimento mais eficiente e fundamentado, reduzindo o risco de perda de informações importantes e o uso do papel físico, que gera impactos ambientais. Além dos benefícios para o meio ambiente, a gestão digital traz vantagens como a eliminação da necessidade de grandes áreas de arquivamento, maior agilidade na busca por informações, facilidade na atualização de dados, acesso simultâneo por múltiplos usuários e a garantia de cópias de segurança (BARROS, 2013).
 ```
 
+## Instalação
+
+1. Utilize `git clone` para colocar o projeto em um ambiente com PHP, Composer e Laravel instalados
+2. Execute o script [setup.sh](./scripts/setup.sh) (ou manualmente execute os comando se estiver em Windows)
+    1. Opcionalmente, configure o arquivo .env com o banco de dados que preferir, conforme a [documentação](https://laravel.com/docs/12.x/database#configuration)
+3. Execute `php artisan migrate:fresh --seed` ou o script [migrate.sh](./scripts/migrate.sh)
+
 ## Documentação
 
 > Veja [endpoints/list.md](https://gitlab.com/eduardosaraujo11/tcc-minha-saude/-/blob/main/Projeto/Endpoints/list.md)
@@ -42,6 +49,11 @@ Essa abordagem possibilita um atendimento mais eficiente e fundamentado, reduzin
 -   Leitura e processamento de dados de pesquisa do documento utilizando IA
 -   Funcionalidade de exportar documento em arquivo .zip
 
+## Roadmap
+
+-   [ ] Implementar funcionalidade de autenticação, começando com google auth test
+
 ## Tutoriais
 
 https://www.youtube.com/watch?v=YGqCZjdgJJk
+https://www.youtube.com/watch?v=wT1lcJ_zn18
