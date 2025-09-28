@@ -12,7 +12,7 @@ class AuthController extends Controller
      */
     public function loginWithGoogle(Request $request)
     {
-        throw new \Exception("Class not implemented");
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
@@ -20,22 +20,38 @@ class AuthController extends Controller
      */
     public function loginWithEmail(Request $request)
     {
-        throw new \Exception("Class not implemented");
+        return response()->json(['status' => 'not_implemented']);
+    }
+
+    /**
+     * Handle user registration with Google
+     */
+    public function registerWithGoogle(Request $request)
+    {
+        return response()->json(['status' => 'not_implemented']);
+    }
+
+    /**
+     * Handle user registration with Email
+     */
+    public function registerWithEmail(Request $request)
+    {
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
      * Send e-mail code for login
      */
-    public function sendEmailCode(Request $request)
+    public function sendEmail(Request $request)
     {
-        throw new \Exception("Class not implemented");
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
-     * Handle user registration
+     * Handle user logout
      */
-    public function register(Request $request)
+    public function logout(Request $request)
     {
-        throw new \Exception("Class not implemented");
+        return response()->json(['status' => 'not_implemented']);
     }
 }

@@ -10,19 +10,27 @@ use App\Models\Document;
 class DocumentController extends Controller
 {
     /**
+     * Upload new document(s).
+     */
+    public function upload()
+    {
+        return response()->json(['status' => 'not_implemented']);
+    }
+
+    /**
+     * Download a specific document.
+     */
+    public function download(Document $document)
+    {
+        return response()->json(['status' => 'not_implemented']);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
@@ -38,15 +46,7 @@ class DocumentController extends Controller
      */
     public function show(Document $document)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Document $document)
-    {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
@@ -54,7 +54,7 @@ class DocumentController extends Controller
      */
     public function update(UpdateDocumentRequest $request, Document $document)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
@@ -62,6 +62,6 @@ class DocumentController extends Controller
      */
     public function destroy(Document $document)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 }

@@ -34,11 +34,11 @@ class ShareController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource by code.
      */
-    public function show(Share $share)
+    public function show($code)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
@@ -58,10 +58,10 @@ class ShareController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage by code.
      */
-    public function destroy(Share $share)
+    public function destroy($code)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 }

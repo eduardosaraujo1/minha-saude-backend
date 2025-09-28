@@ -8,58 +8,66 @@ use Illuminate\Http\Request;
 class ProfileController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display the authenticated user's profile.
      */
-    public function index()
+    public function show()
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Update the user's name.
      */
-    public function create()
+    public function updateName(Request $request)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update the user's birthdate.
      */
-    public function store(Request $request)
+    public function updateBirthdate(Request $request)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
-     * Display the specified resource.
+     * Update the user's phone number.
      */
-    public function show(string $id)
+    public function updatePhone(Request $request)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Verify phone number with SMS code.
      */
-    public function edit(string $id)
+    public function verifyPhone(Request $request)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Send SMS verification code.
      */
-    public function update(Request $request, string $id)
+    public function sendSms(Request $request)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Link Google account to user profile.
      */
-    public function destroy(string $id)
+    public function linkGoogle(Request $request)
     {
-        //
+        return response()->json(['status' => 'not_implemented']);
+    }
+
+    /**
+     * Schedule user account deletion.
+     */
+    public function destroy()
+    {
+        return response()->json(['status' => 'not_implemented']);
     }
 }
