@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Admin;
 use App\Models\Document;
 use App\Models\Enums\UserAuthMethod;
+use App\Models\Export;
 use App\Models\Share;
 use App\Models\User;
 use DateTime;
@@ -152,6 +153,17 @@ class ModelSetupTest extends TestCase
 
         $this->assertInstanceOf(Admin::class, $admin);
         $this->assertEquals($adminData['username'], $admin->username);
+    }
+
+    public function test_export_model_can_be_created()
+    {
+        $exportData = [
+            'file_path' => fake()->filePath(),
+            'user_id' => User::factory()->create()->id,
+        ];
+        $export = Export::factory()->create($exportData);
+
+        $this->assertInstanceOf(Export::class, $export);
     }
 
     public function test_models_use_correct_casts(): void

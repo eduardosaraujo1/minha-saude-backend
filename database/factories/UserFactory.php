@@ -23,15 +23,17 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $method = fake()->randomElement(['google', 'email']);
+
         return [
             'name' => fake()->name(),
             'cpf' => fake()->unique()->numerify('###.###.###-##'),
-            'metodo_autenticacao' => fake()->randomElement(['google', 'email']),
-            'google_id' => fake()->optional(0.3)->uuid(),
+            'metodo_autenticacao' => $method,
+            'google_id' => $method === 'google' ? fake()->uuid() : null,
             'email' => fake()->unique()->safeEmail(),
             'data_nascimento' => fake()->dateTimeBetween('-80 years', '-18 years')->format('Y-m-d'),
             'telefone' => fake()->phoneNumber(),
-            'remember_token' => Str::random(10),
+            'remember_token' => fake()->optional()->randomElement([Str::random(10)]),
         ];
     }
 
