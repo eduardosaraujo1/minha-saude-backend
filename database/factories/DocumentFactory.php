@@ -18,9 +18,16 @@ class DocumentFactory extends Factory
     public function definition(): array
     {
         $tiposDocumento = ['Receita', 'Exame', 'Laudo', 'Atestado', 'Relatório Médico', 'Prescrição'];
+        $titulos =  [
+            'Exame de Sangue Completo',
+            'Receita Médica - Antibióticos',
+            'Laudo de Raio-X Tórax',
+            'Relatório de Consulta Cardiológica',
+            'Atestado Médico - 3 dias'
+        ];
 
         return [
-            'titulo' => fake()->sentence(3),
+            'titulo' => fake()->randomElement($titulos),
             'nome_paciente' => fake()->name(),
             'nome_medico' => 'Dr. ' . fake()->name(),
             'tipo_documento' => fake()->randomElement($tiposDocumento),
