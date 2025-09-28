@@ -24,20 +24,13 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle user registration with Google
+     * Handle user registration
      */
-    public function registerWithGoogle(Request $request)
+    public function register(Request $request)
     {
         return response()->json(['status' => 'not_implemented']);
     }
 
-    /**
-     * Handle user registration with Email
-     */
-    public function registerWithEmail(Request $request)
-    {
-        return response()->json(['status' => 'not_implemented']);
-    }
 
     /**
      * Send e-mail code for login

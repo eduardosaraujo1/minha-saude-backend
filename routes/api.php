@@ -12,8 +12,7 @@ Route::prefix('v1')->group(function () {
     // Authentication routes
     Route::post('/auth/login/google', [App\Http\Controllers\Api\V1\AuthController::class, 'loginWithGoogle']);
     Route::post('/auth/login/email', [App\Http\Controllers\Api\V1\AuthController::class, 'loginWithEmail']);
-    Route::post('/auth/register/google', [App\Http\Controllers\Api\V1\AuthController::class, 'registerWithGoogle']);
-    Route::post('/auth/register/email', [App\Http\Controllers\Api\V1\AuthController::class, 'registerWithEmail']);
+    Route::post('/auth/register', [App\Http\Controllers\Api\V1\AuthController::class, 'register']);
     Route::post('/auth/send-email', [App\Http\Controllers\Api\V1\AuthController::class, 'sendEmail']);
     Route::post('/auth/logout', [App\Http\Controllers\Api\V1\AuthController::class, 'logout'])->middleware('auth:sanctum');
 
