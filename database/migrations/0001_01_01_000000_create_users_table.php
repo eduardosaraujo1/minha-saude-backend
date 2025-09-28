@@ -15,13 +15,11 @@ return new class extends Migration {
             $table->id()->autoIncrement();
             $table->string('name');
             $table->string('cpf', 14)->unique();
+            $table->date('data_nascimento');
+            $table->string('telefone', 20);
             $table->string('metodo_autenticacao')->default(UserAuthMethod::Email->value); // 'google' or 'email'
             $table->string('google_id')->nullable();
             $table->string('email')->unique();
-            $table->date('data_nascimento');
-            $table->string('telefone', 20);
-            // $table->timestamp('email_verified_at')->nullable();
-            // $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });

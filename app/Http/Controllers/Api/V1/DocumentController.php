@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreDocumentRequest;
-use App\Http\Requests\UpdateDocumentRequest;
+use App\Http\Requests\V1\StoreDocumentRequest;
+use App\Http\Requests\V1\UpdateDocumentRequest;
 use App\Models\Document;
 
 class DocumentController extends Controller

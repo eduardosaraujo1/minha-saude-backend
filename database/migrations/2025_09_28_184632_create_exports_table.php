@@ -10,13 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('shares', function (Blueprint $table) {
-            $table->id()->autoIncrement();
-            $table->string('codigo', 8)->unique();
-            $table->dateTime('data_primeiro_uso')->nullable();
-            $table->boolean('expirado')->default(false);
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+        Schema::create('exports', function (Blueprint $table) {
+            $table->id();
+            $table->string('file_path');
             $table->timestamps();
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
         });
     }
 
@@ -25,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('shares');
+        Schema::dropIfExists('exports');
     }
 };

@@ -18,3 +18,5 @@ else
     echo "Failed to generate application key." >&2
     exit 1
 fi
+
+php artisan boost:install

@@ -10,14 +10,19 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('document_share', function (Blueprint $table) {
-            $table->foreignUuid('document_id')
+        Schema::create('document_share', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('document_id')
                 ->constrained('documents')
                 ->cascadeOnDelete();
-            $table->foreignUuid('share_id')
+            $table->foreignId('share_id')
                 ->constrained('shares')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
+            $table->timestamps();
+
+            // Prevent duplicate entries
+            $table->unique(['document_id', 'share_id']);
         });
     }
 
@@ -26,8 +31,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('document_share', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('document_share');
     }
 };

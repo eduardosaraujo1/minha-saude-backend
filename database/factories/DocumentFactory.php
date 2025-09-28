@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +17,37 @@ class DocumentFactory extends Factory
      */
     public function definition(): array
     {
+        $tiposDocumento = ['Receita', 'Exame', 'Laudo', 'Atestado', 'Relatório Médico', 'Prescrição'];
+
         return [
-            //
+            'titulo' => fake()->sentence(3),
+            'nome_paciente' => fake()->name(),
+            'nome_medico' => 'Dr. ' . fake()->name(),
+            'tipo_documento' => fake()->randomElement($tiposDocumento),
+            'data_documento' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
+            'is_processing' => fake()->boolean(20), // 20% chance of being processed
+            'caminho_arquivo' => fake()->filePath(),
+            'user_id' => User::factory(),
         ];
+    }
+
+    /**
+     * Indicate that the document is currently being processed.
+     */
+    public function processing(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_processing' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the document is for a specific user.
+     */
+    public function forUser(User $user): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'user_id' => $user->id,
+        ]);
     }
 }

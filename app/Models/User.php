@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Enums\UserAuthMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -21,7 +22,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'cpf',
+        'metodo_autenticacao',
+        'google_id',
         'email',
+        'data_nascimento',
+        'telefone',
         'password',
     ];
 
@@ -31,7 +37,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password',
         'remember_token',
     ];
 
@@ -43,9 +48,24 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
             'metodo_autenticacao' => UserAuthMethod::class,
+            'data_nascimento' => 'date',
         ];
+    }
+
+    /**
+     * Get the documents for the user.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
+    /**
+     * Get the shares for the user.
+     */
+    public function shares(): HasMany
+    {
+        return $this->hasMany(Share::class);
     }
 }

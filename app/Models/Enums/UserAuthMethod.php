@@ -2,7 +2,7 @@
 
 namespace App\Models\Enums;
 
-enum UserAuthMethod
+enum UserAuthMethod: string
 {
     case Google = "google";
     case Email = "email";
