@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Policies;
+namespace App\Domain\Policies;
 
-use App\Models\Share;
-use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Domain\Models\Share;
+use App\Domain\Models\User;
 
 class SharePolicy
 {

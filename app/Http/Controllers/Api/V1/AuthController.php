@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Domain\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -38,7 +38,7 @@ class AuthController extends Controller
     /**
      * Login via código de e-mail
      */
-    public function loginWithEmail(Request $request)
+    public function loginEmail(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -51,7 +51,7 @@ class AuthController extends Controller
         $cacheKey = "login_email_code_{$email}";
         $cachedCode = Cache::get($cacheKey);
 
-        if (!$cachedCode || $cachedCode != $code) {
+        if (! $cachedCode || $cachedCode != $code) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Código inválido',
@@ -82,7 +82,7 @@ class AuthController extends Controller
     /**
      * Login via Google usando Server Authorization Token
      */
-    public function loginWithGoogle(Request $request)
+    public function loginGoogle(Request $request)
     {
         $request->validate([
             'token_oauth' => 'required|string',
@@ -108,7 +108,7 @@ class AuthController extends Controller
         );
 
         // Caso o usuário exista apenas por email, vincular google_id
-        if (!$user->google_id) {
+        if (! $user->google_id) {
             $user->google_id = $googleId;
             $user->save();
         }

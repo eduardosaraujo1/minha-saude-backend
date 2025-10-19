@@ -1,7 +1,11 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\ShareController;
+use App\Http\Controllers\Api\V1\TrashController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
@@ -10,48 +14,54 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
     // Authentication routes
-    Route::post('/auth/login/google', [App\Http\Controllers\Api\V1\AuthController::class, 'loginWithGoogle']);
-    Route::post('/auth/login/email', [App\Http\Controllers\Api\V1\AuthController::class, 'loginWithEmail']);
-    Route::post('/auth/register', [App\Http\Controllers\Api\V1\AuthController::class, 'register']);
-    Route::post('/auth/send-email', [App\Http\Controllers\Api\V1\AuthController::class, 'sendEmail']);
-    Route::post('/auth/logout', [App\Http\Controllers\Api\V1\AuthController::class, 'logout'])->middleware('auth:sanctum');
+    Route::post('/auth/login/google', [AuthController::class, 'loginGoogle'])
+        ->name('auth.login.google');
+    Route::post('/auth/login/email', [AuthController::class, 'loginEmail'])
+        ->name('auth.login.email');
+    Route::post('/auth/register', [AuthController::class, 'register'])
+        ->name('auth.register');
+    Route::post('/auth/send-email', [AuthController::class, 'sendEmail'])
+        ->name('auth.send.email');
+    Route::post('/auth/logout', [AuthController::class, 'logout'])
+        ->middleware('auth:sanctum')
+        ->name('auth.logout');
 
     // Profile routes
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/profile', [App\Http\Controllers\Api\V1\ProfileController::class, 'show']);
-        Route::put('/profile/name', [App\Http\Controllers\Api\V1\ProfileController::class, 'updateName']);
-        Route::put('/profile/birthdate', [App\Http\Controllers\Api\V1\ProfileController::class, 'updateBirthdate']);
-        Route::put('/profile/phone', [App\Http\Controllers\Api\V1\ProfileController::class, 'updatePhone']);
-        Route::post('/profile/phone/verify', [App\Http\Controllers\Api\V1\ProfileController::class, 'verifyPhone']);
-        Route::post('/profile/phone/send-sms', [App\Http\Controllers\Api\V1\ProfileController::class, 'sendSms']);
-        Route::post('/profile/google/link', [App\Http\Controllers\Api\V1\ProfileController::class, 'linkGoogle']);
-        Route::delete('/profile', [App\Http\Controllers\Api\V1\ProfileController::class, 'destroy']);
+        Route::get('/profile', [ProfileController::class, 'getProfile']);
+        Route::put('/profile/name', [ProfileController::class, 'putName']);
+        Route::put('/profile/birthdate', [ProfileController::class, 'putBirthdate']);
+        Route::put('/profile/phone', [ProfileController::class, 'putPhone']);
+        Route::post('/profile/phone/verify', [ProfileController::class, 'phoneVerify']);
+        Route::post('/profile/phone/send-sms', [ProfileController::class, 'phoneSendSms']);
+        Route::post('/profile/google/link', [ProfileController::class, 'googleLink']);
+        Route::delete('/profile', [ProfileController::class, 'deleteProfile']);
     });
 
     // Document routes
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/documents/upload', [App\Http\Controllers\Api\V1\DocumentController::class, 'upload']);
-        Route::get('/documents', [App\Http\Controllers\Api\V1\DocumentController::class, 'index']);
-        Route::get('/documents/{id}', [App\Http\Controllers\Api\V1\DocumentController::class, 'show']);
-        Route::put('/documents/{id}', [App\Http\Controllers\Api\V1\DocumentController::class, 'update']);
-        Route::delete('/documents/{id}', [App\Http\Controllers\Api\V1\DocumentController::class, 'destroy']);
-        Route::post('/documents/{id}/download', [App\Http\Controllers\Api\V1\DocumentController::class, 'download']);
+        Route::post('/documents/upload', [DocumentController::class, 'upload']);
+        Route::get('/documents', [DocumentController::class, 'index']);
+        Route::get('/documents/{id}', [DocumentController::class, 'show']);
+        Route::put('/documents/{id}', [DocumentController::class, 'update']);
+        Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
+        Route::post('/documents/{id}/download', [DocumentController::class, 'download']);
     });
 
     // Trash routes
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/trash', [App\Http\Controllers\Api\V1\TrashController::class, 'index']);
-        Route::get('/trash/{id}', [App\Http\Controllers\Api\V1\TrashController::class, 'show']);
-        Route::post('/trash/{id}/restore', [App\Http\Controllers\Api\V1\TrashController::class, 'restore']);
-        Route::post('/trash/{id}/destroy', [App\Http\Controllers\Api\V1\TrashController::class, 'destroy']);
+        Route::get('/trash', [TrashController::class, 'index']);
+        Route::get('/trash/{id}', [TrashController::class, 'show']);
+        Route::post('/trash/{id}/restore', [TrashController::class, 'restore']);
+        Route::post('/trash/{id}/destroy', [TrashController::class, 'destroy']);
     });
 
     // Share routes (using /shares for Laravel convention)
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/shares', [App\Http\Controllers\Api\V1\ShareController::class, 'store']);
-        Route::get('/shares', [App\Http\Controllers\Api\V1\ShareController::class, 'index']);
-        Route::get('/shares/{code}', [App\Http\Controllers\Api\V1\ShareController::class, 'show']);
-        Route::delete('/shares/{code}', [App\Http\Controllers\Api\V1\ShareController::class, 'destroy']);
+        Route::post('/shares', [ShareController::class, 'store']);
+        Route::get('/shares', [ShareController::class, 'index']);
+        Route::get('/shares/{code}', [ShareController::class, 'show']);
+        Route::delete('/shares/{code}', [ShareController::class, 'destroy']);
     });
 
     // Export routes

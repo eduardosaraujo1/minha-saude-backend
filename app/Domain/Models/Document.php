@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Domain\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Share extends Model
+class Document extends Model
 {
-    /** @use HasFactory<\Database\Factories\ShareFactory> */
+    /** @use HasFactory<\Database\Factories\DocumentFactory> */
     use HasFactory;
 
     /**
@@ -18,14 +18,18 @@ class Share extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'codigo',
-        'data_primeiro_uso',
-        'expirado',
+        'titulo',
+        'nome_paciente',
+        'nome_medico',
+        'tipo_documento',
+        'data_documento',
+        'is_processing',
+        'caminho_arquivo',
         'user_id',
     ];
 
     /**
-     * Get the user that owns the share.
+     * Get the user that owns the document.
      */
     public function user(): BelongsTo
     {
@@ -33,11 +37,11 @@ class Share extends Model
     }
 
     /**
-     * Get the documents associated with the share.
+     * Get the shares associated with the document.
      */
-    public function documents(): BelongsToMany
+    public function shares(): BelongsToMany
     {
-        return $this->belongsToMany(Document::class)->withTimestamps();
+        return $this->belongsToMany(Share::class)->withTimestamps();
     }
 
     /**
@@ -48,8 +52,8 @@ class Share extends Model
     protected function casts(): array
     {
         return [
-            'data_primeiro_uso' => 'datetime',
-            'expirado' => 'boolean',
+            'is_processing' => 'boolean',
+            'data_documento' => 'date',
         ];
     }
 }

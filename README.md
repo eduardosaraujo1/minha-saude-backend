@@ -20,6 +20,15 @@ Essa abordagem possibilita um atendimento mais eficiente e fundamentado, reduzin
 > Veja [endpoints/list.md](https://gitlab.com/eduardosaraujo11/tcc-minha-saude/-/blob/main/Projeto/Endpoints/list.md)
 > Veja [Banco de Dados/script.sql](https://gitlab.com/eduardosaraujo11/tcc-minha-saude/-/blob/main/Projeto/Banco%20de%20Dados/script.sql)
 
+## Estrutura do projeto
+
+O projeto modulariza funcionalidades através da divisão em três camadas, comum na Clean Architecture:
+
+-   Camada **Http**: Criada por padrão pelo Laravel e sendo equivalente à camada **Presentation**, envolve o ciclo de vida de uma requisição HTTP, definindo erros ou HTML a ser retornado.
+-   Camada **Domain**: Normalmente não colocada em uma pasta específica no Laravel, envolve toda a lógica de negócio da aplicação, decidindo quais dados devem ser utilizados e como utilizar
+-   Camada **Data**: Envolve
+    -   Nota: normalmente essa camada também possui _Repositories_, que servem para abstrair as interações com serviços. Isso é útil quando é necessário utilizar mais de um serviço para realizar uma ação (exemplo: interação com banco de dados e serviço google). Com o Eloquent ORM, a maior parte dos repositórios seriam apenas uma camada desnecessária que fica no caminho dos serviços. Por isso, a camada Domain utilizará os Services diretamente.
+
 ## Controllers
 
 ### API

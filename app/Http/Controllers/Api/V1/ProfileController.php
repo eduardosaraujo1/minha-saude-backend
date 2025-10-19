@@ -10,7 +10,7 @@ class ProfileController extends Controller
     /**
      * Display the authenticated user's profile.
      */
-    public function show()
+    public function getProfile()
     {
         return response()->json(['status' => 'not_implemented']);
     }
@@ -18,7 +18,7 @@ class ProfileController extends Controller
     /**
      * Update the user's name.
      */
-    public function updateName(Request $request)
+    public function putName(Request $request)
     {
         return response()->json(['status' => 'not_implemented']);
     }
@@ -26,7 +26,7 @@ class ProfileController extends Controller
     /**
      * Update the user's birthdate.
      */
-    public function updateBirthdate(Request $request)
+    public function putBirthdate(Request $request)
     {
         return response()->json(['status' => 'not_implemented']);
     }
@@ -34,7 +34,7 @@ class ProfileController extends Controller
     /**
      * Update the user's phone number.
      */
-    public function updatePhone(Request $request)
+    public function putPhone(Request $request)
     {
         return response()->json(['status' => 'not_implemented']);
     }
@@ -42,7 +42,7 @@ class ProfileController extends Controller
     /**
      * Verify phone number with SMS code.
      */
-    public function verifyPhone(Request $request)
+    public function phoneVerify(Request $request)
     {
         return response()->json(['status' => 'not_implemented']);
     }
@@ -50,7 +50,7 @@ class ProfileController extends Controller
     /**
      * Send SMS verification code.
      */
-    public function sendSms(Request $request)
+    public function phoneSendSms(Request $request)
     {
         return response()->json(['status' => 'not_implemented']);
     }
@@ -58,7 +58,7 @@ class ProfileController extends Controller
     /**
      * Link Google account to user profile.
      */
-    public function linkGoogle(Request $request)
+    public function googleLink(Request $request)
     {
         return response()->json(['status' => 'not_implemented']);
     }
@@ -66,7 +66,7 @@ class ProfileController extends Controller
     /**
      * Schedule user account deletion.
      */
-    public function destroy()
+    public function deleteProfile()
     {
         return response()->json(['status' => 'not_implemented']);
     }

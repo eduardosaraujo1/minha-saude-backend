@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Policies;
+namespace App\Domain\Policies;
 
-use App\Models\Document;
-use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Domain\Models\Document;
+use App\Domain\Models\User;
 
 class DocumentPolicy
 {
