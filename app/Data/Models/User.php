@@ -73,9 +73,3 @@ class User extends Authenticatable
         return $this->hasMany(Share::class);
     }
 }
-
-enum UserAuthMethod: string
-{
-    case Google = 'google';
-    case Email = 'email';
-}

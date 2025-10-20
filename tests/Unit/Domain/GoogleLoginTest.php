@@ -7,6 +7,7 @@ use App\Data\Models\UserAuthMethod;
 use App\Data\Services\DTO\GoogleUserInfo;
 use App\Data\Services\Google\GoogleService;
 use App\Domain\Actions\DTO\LoginResult;
+use App\Domain\Actions\GoogleLogin;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Utils\Result;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,21 +32,22 @@ class GoogleLoginTest extends TestCase
             'google_id' => 'google-123',
             'metodo_autenticacao' => UserAuthMethod::Google,
         ]);
+        $fakeOauthToken = 'valid-oauth-token';
 
         // Arrange: Set up a mock GoogleService to return user info for an existing user
-        $mockGoogleService = $this->mock(GoogleService::class, function ($mock) {
+        $mockGoogleService = $this->mock(GoogleService::class, function (\Mockery\MockInterface $mock) use ($existingUser, $fakeOauthToken) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
-                ->with('valid-oauth-token')
+                ->with($fakeOauthToken)
                 ->andReturn(Result::success(new GoogleUserInfo(
-                    googleId: 'google-123',
-                    email: 'existing@example.com'
+                    googleId: $existingUser->google_id,
+                    email: $existingUser->email,
                 )));
         });
 
         // Act
-        $googleLogin = new GoogleLogin($mockGoogleService); // phpcs: ignore
-        $result = $googleLogin->execute('valid-oauth-token');
+        $googleLogin = new GoogleLogin($mockGoogleService); // phpcs: ignore Mockery\MockInterface
+        $result = $googleLogin->execute($fakeOauthToken);
 
         // Assert
         $this->assertTrue($result->isSuccess());

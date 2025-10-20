@@ -86,9 +86,9 @@ class AuthController extends Controller
     public function loginGoogle(Request $request, GoogleLogin $googleLogin)
     {
         $request->validate([
-            'token_oauth' => 'required|string',
+            'tokenOauth' => 'required|string',
         ]);
-        $token = $request->token_oauth;
+        $token = $request->tokenOauth;
 
         $loginResult = $googleLogin->execute($token);
 
@@ -104,7 +104,6 @@ class AuthController extends Controller
         }
 
         return $loginResult->getOrThrow()->toArray();
-        // TODO: testar endpoint
     }
 
     /**
