@@ -44,7 +44,7 @@ class GoogleLoginTest extends TestCase
         });
 
         // Act
-        $googleLogin = new GoogleLogin($mockGoogleService);
+        $googleLogin = new GoogleLogin($mockGoogleService); // phpcs: ignore
         $result = $googleLogin->execute('valid-oauth-token');
 
         // Assert
@@ -73,7 +73,7 @@ class GoogleLoginTest extends TestCase
         });
 
         // Act: Call GoogleLogin with a valid OAuth token
-        $googleLogin = new GoogleLogin($mockGoogleService);
+        $googleLogin = new GoogleLogin($mockGoogleService); // phpcs: ignore
         $result = $googleLogin->execute('valid-oauth-token');
 
         // Assert: Verify the returned LoginResult indicates unregistered user
@@ -106,7 +106,7 @@ class GoogleLoginTest extends TestCase
         // (If GoogleService fails, we should never reach database queries)
 
         // Act: Call GoogleLogin with an invalid OAuth token
-        $googleLogin = new GoogleLogin($mockGoogleService);
+        $googleLogin = new GoogleLogin($mockGoogleService); // phpcs: ignore
         $result = $googleLogin->execute('invalid-oauth-token');
 
         // Assert: Verify the returned Result is a Failure

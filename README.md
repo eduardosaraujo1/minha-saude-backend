@@ -12,8 +12,10 @@ Essa abordagem possibilita um atendimento mais eficiente e fundamentado, reduzin
 
 1. Utilize `git clone` para colocar o projeto em um ambiente com PHP, Composer e Laravel instalados
 2. Execute o script [setup.sh](./scripts/setup.sh) (ou manualmente execute os comando se estiver em Windows)
-    1. Opcionalmente, configure o arquivo .env com o banco de dados que preferir, conforme a [documentação](https://laravel.com/docs/12.x/database#configuration)
-3. Execute `php artisan migrate:fresh --seed` ou o script [migrate.sh](./scripts/migrate.sh)
+3. Configure os seguintes campos do .env:
+    - `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` — Necessário para endpoints de autenticação com Google
+    - Opcional: Alterar parametros do banco de dados (`DB_*`) para o que preferir, conforme a [documentação](https://laravel.com/docs/12.x/database#configuration)
+4. Execute `php artisan migrate:fresh --seed` ou o script [migrate.sh](./scripts/migrate.sh)
 
 ## Documentação
 

@@ -20,6 +20,11 @@ class GoogleLogin
      */
     public function execute(string $oauthToken): Result
     {
+        try {
+            // code...
+        } catch (\Exception $e) {
+            return Result::failure($e);
+        }
         // Use GoogleService to get e-mail and Google ID from the OAuth token
 
         // If e-mail exists in the database, retrieve the user, generate token, and return LoginResult
