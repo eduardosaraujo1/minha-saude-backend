@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Domain\Models\Document;
+use App\Domain\Models\Share;
+use App\Domain\Models\User;
 use Illuminate\Database\Seeder;
 
 class ShareSeeder extends Seeder
@@ -13,21 +15,22 @@ class ShareSeeder extends Seeder
     public function run(): void
     {
         // Get existing users and documents
-        $users = \App\Models\User::all();
-        $documents = \App\Models\Document::all();
+        $users = User::all();
+        $documents = Document::all();
 
         if ($users->isEmpty() || $documents->isEmpty()) {
             $this->command->warn('Users or Documents not found. Please run UserSeeder and DocumentSeeder first.');
+
             return;
         }
 
         // Create shares for users
-        $users->each(function (\App\Models\User $user) use ($documents) {
+        $users->each(function (User $user) use ($documents) {
             // Each user gets 1-3 shares
             $shareCount = fake()->numberBetween(1, 3);
 
             for ($i = 0; $i < $shareCount; $i++) {
-                $share = \App\Models\Share::factory()->forUser($user)->create();
+                $share = Share::factory()->forUser($user)->create();
 
                 // Attach random documents to each share (1-4 documents per share)
                 $userDocuments = $documents->where('user_id', $user->id);
@@ -41,12 +44,12 @@ class ShareSeeder extends Seeder
         });
 
         // Create some expired and used shares
-        \App\Models\Share::factory()
+        Share::factory()
             ->count(3)
             ->expired()
             ->create();
 
-        \App\Models\Share::factory()
+        Share::factory()
             ->count(5)
             ->used()
             ->create();

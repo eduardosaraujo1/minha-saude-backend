@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Export;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Domain\Models\Export;
 use Illuminate\Database\Seeder;
 
 class ExportSeeder extends Seeder

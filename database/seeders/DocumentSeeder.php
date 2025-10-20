@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Domain\Models\Document;
+use App\Domain\Models\User;
 use Illuminate\Database\Seeder;
 
 class DocumentSeeder extends Seeder
@@ -13,23 +14,23 @@ class DocumentSeeder extends Seeder
     public function run(): void
     {
         // Get existing users or create some if they don't exist
-        $users = \App\Models\User::all();
+        $users = User::all();
 
         if ($users->isEmpty()) {
-            $users = \App\Models\User::factory()->count(5)->create();
+            $users = User::factory()->count(5)->create();
         }
 
         // Create documents for each user
-        $users->each(function (\App\Models\User $user) {
+        $users->each(function (User $user) {
             // Each user gets 3-8 documents
-            \App\Models\Document::factory()
+            Document::factory()
                 ->count(fake()->numberBetween(3, 8))
                 ->forUser($user)
                 ->create();
 
             // Some users get processing documents
             if (fake()->boolean(40)) {
-                \App\Models\Document::factory()
+                Document::factory()
                     ->forUser($user)
                     ->processing()
                     ->create();
@@ -37,7 +38,7 @@ class DocumentSeeder extends Seeder
         });
 
         // Create some shared test documents
-        \App\Models\Document::factory()
+        Document::factory()
             ->count(5)
             ->create([
                 'titulo' => fake()->randomElement([
@@ -45,8 +46,8 @@ class DocumentSeeder extends Seeder
                     'Receita Médica - Antibióticos',
                     'Laudo de Raio-X Tórax',
                     'Relatório de Consulta Cardiológica',
-                    'Atestado Médico - 3 dias'
-                ])
+                    'Atestado Médico - 3 dias',
+                ]),
             ]);
     }
 }

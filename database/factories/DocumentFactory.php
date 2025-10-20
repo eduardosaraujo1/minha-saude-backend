@@ -2,11 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Domain\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Document>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Domain\Models\Document>
  */
 class DocumentFactory extends Factory
 {
@@ -18,18 +18,18 @@ class DocumentFactory extends Factory
     public function definition(): array
     {
         $tiposDocumento = ['Receita', 'Exame', 'Laudo', 'Atestado', 'Relatório Médico', 'Prescrição'];
-        $titulos =  [
+        $titulos = [
             'Exame de Sangue Completo',
             'Receita Médica - Antibióticos',
             'Laudo de Raio-X Tórax',
             'Relatório de Consulta Cardiológica',
-            'Atestado Médico - 3 dias'
+            'Atestado Médico - 3 dias',
         ];
 
         return [
             'titulo' => fake()->randomElement($titulos),
             'nome_paciente' => fake()->name(),
-            'nome_medico' => 'Dr. ' . fake()->name(),
+            'nome_medico' => 'Dr. '.fake()->name(),
             'tipo_documento' => fake()->randomElement($tiposDocumento),
             'data_documento' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
             'is_processing' => fake()->boolean(20), // 20% chance of being processed
@@ -43,7 +43,7 @@ class DocumentFactory extends Factory
      */
     public function processing(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_processing' => true,
         ]);
     }
@@ -53,7 +53,7 @@ class DocumentFactory extends Factory
      */
     public function forUser(User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $user->id,
         ]);
     }

@@ -3,15 +3,14 @@
 namespace App\Data\Services\Google;
 
 use App\Data\DTO\GoogleUserInfo;
+use App\Utils\Result;
 
-class GoogleService implements IGoogleService
+interface GoogleService
 {
-    public function getUserInfo(string $oauthToken): GoogleUserInfo
-    {
-        // Use Socialite or API to get info from token
-
-        // If unsuccessful return Failure
-
-        // Return GoogleUserInfo with retrieved data
-    }
+    /**
+     * It reads user information from Google using the provided OAuth token.
+     *
+     * @return Result<GoogleUserInfo, \Exception>
+     */
+    public function getUserInfo(string $oauthToken): Result;
 }

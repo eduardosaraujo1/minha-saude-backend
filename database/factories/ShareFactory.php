@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Domain\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Share>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Domain\Models\Share>
  */
 class ShareFactory extends Factory
 {
@@ -31,7 +31,7 @@ class ShareFactory extends Factory
      */
     public function used(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'data_primeiro_uso' => fake()->dateTimeBetween('-1 month', 'now'),
         ]);
     }
@@ -41,7 +41,7 @@ class ShareFactory extends Factory
      */
     public function expired(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'expirado' => true,
         ]);
     }
@@ -51,7 +51,7 @@ class ShareFactory extends Factory
      */
     public function forUser(User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $user->id,
         ]);
     }

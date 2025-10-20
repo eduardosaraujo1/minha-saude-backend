@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\Admin;
-use App\Models\Document;
-use App\Models\Enums\UserAuthMethod;
-use App\Models\Export;
-use App\Models\Share;
-use App\Models\User;
+use App\Domain\Enums\UserAuthMethod;
+use App\Domain\Models\Admin;
+use App\Domain\Models\Document;
+use App\Domain\Models\Export;
+use App\Domain\Models\Share;
+use App\Domain\Models\User;
 use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -213,7 +213,7 @@ class ModelSetupTest extends TestCase
         // Simulate database string values by directly updating the database
         DB::table('users')->where('id', $user->id)->update([
             'data_nascimento' => '1995-06-15',
-            'metodo_autenticacao' => 'email'
+            'metodo_autenticacao' => 'email',
         ]);
 
         // Refresh the model to get values from database
