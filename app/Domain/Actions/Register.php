@@ -2,7 +2,7 @@
 
 namespace App\Domain\Actions;
 
-use App\Domain\DTO\RegisterFormData;
+use App\Domain\Actions\DTO\RegisterFormData;
 use App\Utils\Result;
 
 /**

@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Domain\Enums\UserAuthMethod;
-use App\Domain\Models\Admin;
-use App\Domain\Models\Document;
-use App\Domain\Models\Export;
-use App\Domain\Models\Share;
-use App\Domain\Models\User;
+use App\Data\Models\Admin;
+use App\Data\Models\Document;
+use App\Data\Models\Export;
+use App\Data\Models\Share;
+use App\Data\Models\User;
+use App\Data\Models\UserAuthMethod;
 use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;

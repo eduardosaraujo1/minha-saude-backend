@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Domain;
 
-use App\Data\DTO\GoogleUserInfo;
+use App\Data\Models\User;
+use App\Data\Models\UserAuthMethod;
+use App\Data\Services\DTO\GoogleUserInfo;
 use App\Data\Services\Google\GoogleService;
-use App\Domain\Actions\GoogleLogin;
-use App\Domain\DTO\LoginResult;
-use App\Domain\Enums\UserAuthMethod;
-use App\Domain\Models\User;
+use App\Domain\Actions\DTO\LoginResult;
+use App\Domain\Exceptions\ExceptionDictionary;
 use App\Utils\Result;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -85,7 +85,7 @@ class GoogleLoginTest extends TestCase
         $this->assertNotNull($loginResult->registerToken);
 
         // Assert: Verify the returned register token is stored in cache
-        $cacheKey = "register_token_{$loginResult->registerToken}";
+        $cacheKey = "{$loginResult->registerToken}";
         $cachedData = Cache::get($cacheKey);
         $this->assertNotNull($cachedData);
         $this->assertEquals('newuser@example.com', $cachedData['email']);
@@ -99,7 +99,7 @@ class GoogleLoginTest extends TestCase
             $mock->shouldReceive('getUserInfo')
                 ->once()
                 ->with('invalid-oauth-token')
-                ->andReturn(Result::failure(new \Exception('Invalid OAuth token')));
+                ->andReturn(Result::failure(new \Exception(ExceptionDictionary::INVALID_OAUTH_TOKEN)));
         });
 
         // Arrange: Set up a Eloquent to fail test if it is called
@@ -112,6 +112,6 @@ class GoogleLoginTest extends TestCase
         // Assert: Verify the returned Result is a Failure
         $this->assertTrue($result->isFailure());
         $this->assertInstanceOf(\Exception::class, $result->tryGetFailure());
-        $this->assertEquals('Invalid OAuth token', $result->tryGetFailure()->getMessage());
+        $this->assertEquals(ExceptionDictionary::INVALID_OAUTH_TOKEN, $result->tryGetFailure()->getMessage());
     }
 }

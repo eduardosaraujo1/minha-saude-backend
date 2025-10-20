@@ -5,6 +5,18 @@ declare(strict_types=1);
 namespace App\Utils;
 
 /**
+ * Result é um padrão de projeto que encapsula o resultado de uma operação que pode ter
+ * sucesso ou falha.
+ *
+ * Ao em vez de lançar exceções, uma função pode retornar um objeto Result que contém
+ * o resultado da operação, permitindo que o chamador lide com o sucesso ou a falha de forma mais elegante.
+ *
+ * Isso é especialmente útil em linguagens que não suportam exceções ou quando se
+ * deseja evitar o uso excessivo de exceções para controle de fluxo.
+ *
+ * A desvantagem é que o PHP é um pouco difícil de trabalhar com genéricos, então o uso de Result
+ * pode ser um pouco verboso, precisando de um bloco de comentário em cima de cada função que o retorna.
+ *
  * @template TSuccess
  * @template TError
  */
@@ -25,8 +37,10 @@ readonly class Result
     /**
      * Creates a result representing a failed outcome.
      *
-     * @param  TError  $error
-     * @return Result<never, TError>
+     * @template TNewError
+     *
+     * @param  TNewError  $error
+     * @return Result<never, TNewError>
      */
     public static function failure(mixed $error): Result
     {
@@ -37,10 +51,12 @@ readonly class Result
     }
 
     /**
-     * Creates a result representing a failed outcome.
+     * Creates a result representing a successful outcome.
      *
-     * @param  TSuccess  $value
-     * @return Result<TSuccess, never>
+     * @template TNewSuccess
+     *
+     * @param  TNewSuccess  $value
+     * @return Result<TNewSuccess, never>
      */
     public static function success(mixed $value): Result
     {

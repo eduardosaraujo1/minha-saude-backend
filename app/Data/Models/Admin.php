@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Models;
+namespace App\Data\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +29,11 @@ class Admin extends Model
     protected $hidden = [
         'password',
     ];
+
+    protected static function newFactory(): \Database\Factories\AdminFactory
+    {
+        return \Database\Factories\AdminFactory::new();
+    }
 
     /**
      * Get the attributes that should be cast.

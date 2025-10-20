@@ -1,6 +1,6 @@
 <?php
 
-use App\Domain\Enums\UserAuthMethod;
+use App\Data\Models\UserAuthMethod;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

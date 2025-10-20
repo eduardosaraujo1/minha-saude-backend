@@ -2,14 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Domain\Models\User;
+use App\Data\Models\Export;
+use App\Data\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Domain\Models\Export>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Data\Models\Export>
  */
 class ExportFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var class-string<\Illuminate\Database\Eloquent\Model>
+     */
+    protected $model = Export::class;
+
     /**
      * Define the model's default state.
      *

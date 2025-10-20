@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Models;
+namespace App\Data\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +15,11 @@ class Export extends Model
         'file_path',
         'user_id',
     ];
+
+    protected static function newFactory(): \Database\Factories\ExportFactory
+    {
+        return \Database\Factories\ExportFactory::new();
+    }
 
     public function user(): BelongsTo
     {

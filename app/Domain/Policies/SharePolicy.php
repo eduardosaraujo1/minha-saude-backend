@@ -2,8 +2,8 @@
 
 namespace App\Domain\Policies;
 
-use App\Domain\Models\Share;
-use App\Domain\Models\User;
+use App\Data\Models\Share;
+use App\Data\Models\User;
 
 class SharePolicy
 {

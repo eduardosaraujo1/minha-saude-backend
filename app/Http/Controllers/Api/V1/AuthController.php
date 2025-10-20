@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Domain\Models\User;
+use App\Data\Models\User;
+use App\Domain\Actions\GoogleLogin;
+use App\Domain\Exceptions\ExceptionDictionary;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -82,45 +83,28 @@ class AuthController extends Controller
     /**
      * Login via Google usando Server Authorization Token
      */
-    public function loginGoogle(Request $request)
+    public function loginGoogle(Request $request, GoogleLogin $googleLogin)
     {
         $request->validate([
             'token_oauth' => 'required|string',
         ]);
-
         $token = $request->token_oauth;
 
-        // Obter dados do Google
-        $googleUser = Socialite::driver('google')->stateless()->userFromToken($token);
+        $loginResult = $googleLogin->execute($token);
 
-        $googleId = $googleUser->getId();
-        $email = $googleUser->getEmail();
-        $name = $googleUser->getName();
+        if ($loginResult->isFailure()) {
+            $error = $loginResult->tryGetFailure();
+            $message = $error?->getMessage();
 
-        // Verificar se usuário já existe por google_id ou email
-        $user = User::firstOrCreate(
-            ['google_id' => $googleId],
-            [
-                'email' => $email,
-                'name' => $name,
-                'password' => bcrypt(Str::random(12)),
-            ]
-        );
-
-        // Caso o usuário exista apenas por email, vincular google_id
-        if (! $user->google_id) {
-            $user->google_id = $googleId;
-            $user->save();
+            if ($message === ExceptionDictionary::INVALID_OAUTH_TOKEN) {
+                abort(401, ExceptionDictionary::INVALID_OAUTH_TOKEN);
+            } else {
+                abort(500, 'Erro interno no servidor');
+            }
         }
 
-        $sessionToken = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'status' => 'success',
-            'is_registered' => true,
-            'session_token' => $sessionToken,
-            'user' => $user,
-        ]);
+        return $loginResult->getOrThrow()->toArray();
+        // TODO: testar endpoint
     }
 
     /**

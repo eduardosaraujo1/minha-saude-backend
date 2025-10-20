@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\DTO;
+namespace App\Domain\Actions\DTO;
 
 class LoginResult extends DTO
 {

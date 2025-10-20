@@ -2,8 +2,8 @@
 
 namespace App\Domain\Policies;
 
-use App\Domain\Models\Document;
-use App\Domain\Models\User;
+use App\Data\Models\Document;
+use App\Data\Models\User;
 
 class DocumentPolicy
 {

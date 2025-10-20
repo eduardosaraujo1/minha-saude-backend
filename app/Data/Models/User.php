@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Domain\Models;
+namespace App\Data\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Domain\Enums\UserAuthMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -40,6 +39,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected static function newFactory(): \Database\Factories\UserFactory
+    {
+        return \Database\Factories\UserFactory::new();
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -68,4 +72,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Share::class);
     }
+}
+
+enum UserAuthMethod: string
+{
+    case Google = 'google';
+    case Email = 'email';
 }

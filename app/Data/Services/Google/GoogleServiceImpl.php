@@ -2,7 +2,7 @@
 
 namespace App\Data\Services\Google;
 
-use App\Data\DTO\GoogleUserInfo;
+use App\Data\Services\DTO\GoogleUserInfo;
 use App\Utils\Result;
 use Laravel\Socialite\Facades\Socialite;
 
