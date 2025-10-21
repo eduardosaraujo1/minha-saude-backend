@@ -2,27 +2,19 @@
 
 namespace App\Data\Services\Google;
 
-use App\Data\Services\DTO\GoogleUserInfo;
+use App\Data\Services\Google\DTO\UserInfo;
 use App\Utils\Result;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleServiceImpl implements GoogleService
 {
-    /**
-     * Exchanges OAuth Server Token for Google User Info
-     *
-     * For more information on OAuth2 Google Server Tokens, see https://developers.google.com/identity/protocols/oauth2/web-server
-     *
-     * Also, try it out on https://developers.google.com/oauthplayground/
-     *
-     * @return Result<GoogleUserInfo, \Exception>
-     */
     public function getUserInfo(string $oauthToken): Result
     {
         try {
             // phpcs:ignore
             $driver = Socialite::driver('google')->stateless();
 
+            // Improve intelissense
             assert($driver instanceof \Laravel\Socialite\Two\GoogleProvider);
 
             // Android server auth codes (from authorizeServer()) don't use a redirect_uri
@@ -44,8 +36,8 @@ class GoogleServiceImpl implements GoogleService
                 return Result::failure(new \Exception('Failed to retrieve user info'));
             }
 
-            // Return GoogleUserInfo with retrieved data
-            return Result::success(new GoogleUserInfo(
+            // Return UserInfo with retrieved data
+            return Result::success(new UserInfo(
                 googleId: $user->id,
                 email: $user->email,
             ));

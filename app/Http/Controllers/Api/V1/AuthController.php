@@ -121,7 +121,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Registrar novo usuário via payload {user:{cpf,nome_completo,data_nascimento,telefone,email}, register_token}
+     * Registrar novo usuário
      */
     public function register(Request $request)
     {

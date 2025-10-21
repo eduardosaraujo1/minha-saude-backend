@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Data\Services\DTO;
+namespace App\Data\Services\Google\DTO;
 
-class GoogleUserInfo
+class UserInfo
 {
     public function __construct(
         public string $googleId,

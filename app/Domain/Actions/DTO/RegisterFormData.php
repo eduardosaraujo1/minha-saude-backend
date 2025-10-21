@@ -10,7 +10,7 @@ class RegisterFormData extends DTO
         public string $nome,
         public string $cpf,
         public Carbon $dataNascimento,
-        public Carbon $telefone,
+        public string $telefone,
         public string $registerToken
     ) {}
 }

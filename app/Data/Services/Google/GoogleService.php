@@ -2,15 +2,19 @@
 
 namespace App\Data\Services\Google;
 
-use App\Data\Services\DTO\GoogleUserInfo;
+use App\Data\Services\Google\DTO\UserInfo;
 use App\Utils\Result;
 
 interface GoogleService
 {
     /**
-     * It reads user information from Google using the provided OAuth token.
+     * Exchanges OAuth Server Token for Google User Info
      *
-     * @return Result<GoogleUserInfo, \Exception>
+     * For more information on OAuth2 Google Server Tokens, see https://developers.google.com/identity/protocols/oauth2/web-server
+     *
+     * Also, try it out on https://developers.google.com/oauthplayground/
+     *
+     * @return Result<UserInfo, \Exception>
      */
     public function getUserInfo(string $oauthToken): Result;
 }

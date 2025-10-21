@@ -3,11 +3,12 @@
 namespace App\Domain\Actions;
 
 use App\Data\Models\User;
+use App\Data\Services\Cache\CacheService;
+use App\Data\Services\Cache\DTO\RegisterTokenEntry;
 use App\Data\Services\Google\GoogleService;
 use App\Domain\Actions\DTO\LoginResult;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Utils\Result;
-use Cache;
 use Str;
 
 /**
@@ -15,7 +16,10 @@ use Str;
  */
 class GoogleLogin
 {
-    public function __construct(private GoogleService $googleService) {}
+    public function __construct(
+        private GoogleService $googleService,
+        private CacheService $cacheService
+    ) {}
 
     /**
      * Executes the Action
@@ -32,13 +36,13 @@ class GoogleLogin
                 return Result::failure(new \Exception(ExceptionDictionary::INVALID_OAUTH_TOKEN));
             }
 
-            $googleUserInfo = $exchangeResult->getOrThrow();
-            $googleId = $googleUserInfo->googleId;
-            $email = $googleUserInfo->email;
+            $UserInfo = $exchangeResult->getOrThrow();
+            $googleId = $UserInfo->googleId;
+            $email = $UserInfo->email;
 
             // If google id exists in the database, retrieve the user, generate token, and return LoginResult
             $user = User::where('google_id', $googleId)->first();
-            assert($user instanceof User || $user === null);
+            assert($user instanceof User || $user === null); // Improve intelissense
 
             if ($user !== null) {
                 // User exists, generate session token
@@ -51,11 +55,12 @@ class GoogleLogin
 
             // If user does not exist, generate a register token, store in cache, and return LoginResult indicating not registered
             $token = "register-$googleId-".Str::random(32);
-            Cache::put(
-                key: $token,
-                value: ['google_id' => $googleId, 'email' => $email],
+            $this->cacheService->putRegisterToken(new RegisterTokenEntry(
+                token: $token,
+                googleId: $googleId,
+                email: $email,
                 ttl: now()->addMinutes(15)
-            );
+            ));
 
             return Result::success(LoginResult::needsRegistration(
                 token: $token

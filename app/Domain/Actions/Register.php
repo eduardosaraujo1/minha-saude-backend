@@ -2,7 +2,11 @@
 
 namespace App\Domain\Actions;
 
+use App\Data\Models\User;
+use App\Data\Models\UserAuthMethod;
+use App\Data\Services\Cache\CacheService;
 use App\Domain\Actions\DTO\RegisterFormData;
+use App\Domain\Exceptions\ExceptionDictionary;
 use App\Utils\Result;
 
 /**
@@ -10,6 +14,8 @@ use App\Utils\Result;
  */
 class Register
 {
+    public function __construct(private CacheService $cacheService) {}
+
     /**
      * Executes the Action
      *
@@ -17,12 +23,33 @@ class Register
      */
     public function execute(RegisterFormData $userData): Result
     {
-        // Checks register token in cache to determine user e-mail and google ID
+        try {
+            // Checks register token in cache to determine user e-mail and google ID
+            $tokenEntry = $this->cacheService->getRegisterToken($userData->registerToken);
 
-        // If register token is unavailable, return Failure
+            // Cache must be an array with an e-mail field
+            if (! $tokenEntry) {
+                return Result::failure(new \Exception(ExceptionDictionary::INVALID_REGISTER_TOKEN));
+            }
 
-        // Creates new user in the database with provided data
+            // Create new user in the database with provided data
+            $user = User::create([
+                'name' => $userData->nome,
+                'cpf' => $userData->cpf,
+                'metodo_autenticacao' => $tokenEntry->isGoogle()
+                    ? UserAuthMethod::Google
+                    : UserAuthMethod::Email,
+                'google_id' => $tokenEntry->googleId,
+                'email' => $tokenEntry->email,
+                'data_nascimento' => $userData->dataNascimento,
+                'telefone' => $userData->telefone,
+            ]);
+            assert($user instanceof User); // intelissense helper
 
-        // Creates a session token for the new user and returns it
+            // Create a session token for the new user and returns it
+            return Result::success($user->createToken('session-token'));
+        } catch (\Exception $e) {
+            return Result::failure($e);
+        }
     }
 }

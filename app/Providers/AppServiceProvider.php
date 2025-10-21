@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Data\Services\Cache\CacheService;
 use App\Data\Services\Google\GoogleService;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,6 +18,10 @@ class AppServiceProvider extends ServiceProvider
                 return new \App\Data\Services\Google\GoogleServiceImpl;
             }
         );
+
+        $this->app->singleton(CacheService::class, function ($app) {
+            return new \App\Data\Services\Cache\CacheServiceImpl;
+        });
     }
 
     /**
