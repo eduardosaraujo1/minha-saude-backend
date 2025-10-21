@@ -9,6 +9,7 @@ use App\Domain\Actions\Auth\Register;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\RegisterRequest;
+use App\Mail\AuthVerificationCode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -27,15 +28,14 @@ class AuthController extends Controller
         ]);
 
         $email = $request->email;
-        $code = rand(100000, 999999);
+        $code = (string) rand(100000, 999999);
 
         // Armazenar no cache por 30 minutos (1800 segundos)
         Cache::put("login_email_code_{$email}", $code, 1800);
 
-        Mail::to($email)->send(new \App\Mail\LoginEmailCode($code));
+        Mail::to($email)->send(new AuthVerificationCode($code));
 
         return response()->json([
-            'status' => 'success',
             'message' => 'Código enviado ao e-mail.',
         ]);
     }
