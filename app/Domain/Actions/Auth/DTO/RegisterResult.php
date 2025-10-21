@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Actions\DTO;
+namespace App\Domain\Actions\Auth\DTO;
 
 use App\Data\Models\User;
 

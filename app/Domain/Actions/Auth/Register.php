@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Domain\Actions;
+namespace App\Domain\Actions\Auth;
 
 use App\Data\Models\User;
 use App\Data\Models\UserAuthMethod;
 use App\Data\Services\Cache\CacheService;
-use App\Domain\Actions\DTO\RegisterFormData;
-use App\Domain\Actions\DTO\RegisterResult;
+use App\Domain\Actions\Auth\DTO\RegisterFormData;
+use App\Domain\Actions\Auth\DTO\RegisterResult;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Utils\Result;
 

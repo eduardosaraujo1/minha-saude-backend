@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domain\Actions\DTO;
+namespace App\Domain\Actions\Auth\DTO;
 
-class LoginResult extends DTO
+class LoginResult
 {
     public function __construct(
         public bool $isRegistered,
@@ -18,5 +18,10 @@ class LoginResult extends DTO
     public static function successful(string $token): self
     {
         return new self(isRegistered: true, sessionToken: $token);
+    }
+
+    public function toArray(): array
+    {
+        return get_object_vars($this);
     }
 }

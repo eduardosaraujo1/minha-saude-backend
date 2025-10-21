@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Actions\DTO;
+namespace App\Domain\Actions\Auth\DTO;
 
 use Carbon\Carbon;
 
-class RegisterFormData extends DTO
+class RegisterFormData
 {
     public Carbon $dataNascimento;
 
@@ -18,5 +18,10 @@ class RegisterFormData extends DTO
         $this->dataNascimento = $dataNascimento instanceof Carbon
             ? $dataNascimento
             : Carbon::parse($dataNascimento);
+    }
+
+    public function toArray(): array
+    {
+        return get_object_vars($this);
     }
 }

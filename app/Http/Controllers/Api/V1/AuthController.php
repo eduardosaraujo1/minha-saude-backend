@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Data\Models\User;
-use App\Domain\Actions\DTO\RegisterFormData;
-use App\Domain\Actions\GoogleLogin;
-use App\Domain\Actions\Register;
+use App\Domain\Actions\Auth\DTO\RegisterFormData;
+use App\Domain\Actions\Auth\GoogleLogin;
+use App\Domain\Actions\Auth\Register;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\RegisterRequest;

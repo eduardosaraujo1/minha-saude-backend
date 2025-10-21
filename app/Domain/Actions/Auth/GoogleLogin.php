@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Domain\Actions;
+namespace App\Domain\Actions\Auth;
 
 use App\Data\Models\User;
 use App\Data\Services\Cache\CacheService;
 use App\Data\Services\Cache\DTO\RegisterTokenEntry;
 use App\Data\Services\Google\GoogleService;
-use App\Domain\Actions\DTO\LoginResult;
+use App\Domain\Actions\Auth\DTO\LoginResult;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Utils\Result;
 use Str;
