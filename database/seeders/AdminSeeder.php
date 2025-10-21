@@ -2,8 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Admin;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Data\Models\Admin;
 use Illuminate\Database\Seeder;
 
 class AdminSeeder extends Seeder

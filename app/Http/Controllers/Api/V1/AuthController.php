@@ -2,36 +2,42 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Domain\Models\User;
+use App\Data\Models\User;
+use App\Domain\Actions\Auth\DTO\RegisterFormData;
+use App\Domain\Actions\Auth\GoogleLogin;
+use App\Domain\Actions\Auth\Register;
+use App\Domain\Actions\Auth\RequestVerificationEmail;
+use App\Domain\Exceptions\ExceptionDictionary;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\RegisterRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
     /**
      * Enviar código de login por e-mail
      */
-    public function sendEmail(Request $request)
+    public function sendEmail(Request $request, RequestVerificationEmail $requestVerificationEmail)
     {
-        $request->validate([
+        $validated = $request->validate([
             'email' => 'required|email',
         ]);
 
-        $email = $request->email;
-        $code = rand(100000, 999999);
+        $email = $validated['email'];
 
         // Armazenar no cache por 30 minutos (1800 segundos)
-        Cache::put("login_email_code_{$email}", $code, 1800);
+        $result = $requestVerificationEmail->execute($email);
 
-        Mail::to($email)->send(new \App\Mail\LoginEmailCode($code));
+        if ($result->isFailure()) {
+            abort(500, 'Unexpected error occoured');
+        }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Código enviado ao e-mail.',
         ]);
     }
 
@@ -72,9 +78,8 @@ class AuthController extends Controller
         $sessionToken = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'status' => 'success',
-            'is_registered' => true,
-            'session_token' => $sessionToken,
+            'isRegistered' => true,
+            'sessionToken' => $sessionToken,
             'user' => $user,
         ]);
     }
@@ -82,45 +87,27 @@ class AuthController extends Controller
     /**
      * Login via Google usando Server Authorization Token
      */
-    public function loginGoogle(Request $request)
+    public function loginGoogle(Request $request, GoogleLogin $googleLogin)
     {
         $request->validate([
-            'token_oauth' => 'required|string',
+            'tokenOauth' => 'required|string',
         ]);
+        $token = $request->tokenOauth;
 
-        $token = $request->token_oauth;
+        $loginResult = $googleLogin->execute($token);
 
-        // Obter dados do Google
-        $googleUser = Socialite::driver('google')->stateless()->userFromToken($token);
+        if ($loginResult->isFailure()) {
+            $error = $loginResult->tryGetFailure();
+            $message = $error?->getMessage();
 
-        $googleId = $googleUser->getId();
-        $email = $googleUser->getEmail();
-        $name = $googleUser->getName();
-
-        // Verificar se usuário já existe por google_id ou email
-        $user = User::firstOrCreate(
-            ['google_id' => $googleId],
-            [
-                'email' => $email,
-                'name' => $name,
-                'password' => bcrypt(Str::random(12)),
-            ]
-        );
-
-        // Caso o usuário exista apenas por email, vincular google_id
-        if (! $user->google_id) {
-            $user->google_id = $googleId;
-            $user->save();
+            if ($message === ExceptionDictionary::INVALID_OAUTH_TOKEN) {
+                abort(401, ExceptionDictionary::INVALID_OAUTH_TOKEN);
+            } else {
+                abort(500, 'Erro interno no servidor');
+            }
         }
 
-        $sessionToken = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'status' => 'success',
-            'is_registered' => true,
-            'session_token' => $sessionToken,
-            'user' => $user,
-        ]);
+        return $loginResult->getOrThrow()->toArray();
     }
 
     /**
@@ -138,36 +125,41 @@ class AuthController extends Controller
     }
 
     /**
-     * Registrar novo usuário via payload {user:{cpf,nome_completo,data_nascimento,telefone,email}, register_token}
+     * Registrar novo usuário
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request, Register $registerAction)
     {
-        $request->validate([
-            'user.nome_completo' => 'required|string',
-            'user.cpf' => 'required|string|unique:users,cpf',
-            'user.data_nascimento' => 'required|date',
-            'user.telefone' => 'required|string',
-            'user.email' => 'nullable|email|unique:users,email',
-            'register_token' => 'required|string',
-        ]);
+        $data = $request->validated();
+        $userData = $data['user'];
 
-        $userData = $request->user;
+        $registerResult = $registerAction->execute(new RegisterFormData(
+            nome: $userData['nome'],
+            cpf: $userData['cpf'],
+            dataNascimento: Carbon::parse($userData['dataNascimento']),
+            telefone: $userData['telefone'],
+            registerToken: $data['registerToken'],
+        ));
 
-        $user = User::create([
-            'name' => $userData['nome_completo'],
-            'cpf' => $userData['cpf'],
-            'data_nascimento' => $userData['data_nascimento'],
-            'telefone' => $userData['telefone'],
-            'email' => $userData['email'] ?? null,
-            'password' => bcrypt(Str::random(12)),
-        ]);
+        if ($registerResult->isFailure()) {
+            $error = $registerResult->tryGetFailure()?->getMessage();
+            if ($error === ExceptionDictionary::INVALID_REGISTER_TOKEN) {
+                abort(401, ExceptionDictionary::INVALID_REGISTER_TOKEN);
+            }
+            abort(500, $error ?? 'Erro interno no servidor');
+        }
 
-        $sessionToken = $user->createToken('auth_token')->plainTextToken;
+        $register = $registerResult->getOrThrow();
+        $token = $register->sessionToken;
+        $user = $register->user;
 
-        return response()->json([
-            'status' => 'success',
-            'session_token' => $sessionToken,
-            'user' => $user,
-        ]);
+        return [
+            'sessionToken' => $token,
+            'user' => [
+                'nome' => $user->name,
+                'cpf' => $user->cpf,
+                'dataNascimento' => $user->data_nascimento->format('Y-m-d'),
+                'telefone' => $user->telefone,
+            ],
+        ];
     }
 }

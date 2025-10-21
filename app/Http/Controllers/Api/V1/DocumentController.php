@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Domain\Models\Document;
+use App\Data\Models\Document;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreDocumentRequest;
 use App\Http\Requests\V1\UpdateDocumentRequest;

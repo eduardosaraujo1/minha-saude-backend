@@ -2,16 +2,19 @@
 
 namespace App\Data\Services\Google;
 
-use App\Data\DTO\GoogleUserInfo;
+use App\Data\Services\Google\DTO\UserInfo;
+use App\Utils\Result;
 
-class GoogleService implements IGoogleService
+interface GoogleService
 {
-    public function getUserInfo(string $oauthToken): GoogleUserInfo
-    {
-        // Use Socialite or API to get info from token
-
-        // If unsuccessful return Failure
-
-        // Return GoogleUserInfo with retrieved data
-    }
+    /**
+     * Exchanges OAuth Server Token for Google User Info
+     *
+     * For more information on OAuth2 Google Server Tokens, see https://developers.google.com/identity/protocols/oauth2/web-server
+     *
+     * Also, try it out on https://developers.google.com/oauthplayground/
+     *
+     * @return Result<UserInfo, \Exception>
+     */
+    public function getUserInfo(string $oauthToken): Result;
 }

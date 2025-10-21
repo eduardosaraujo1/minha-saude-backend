@@ -2,22 +2,24 @@
 
 Esse projeto é a interface web e a API Backend do Minha Saúde:
 
-```markdown
 O projeto propõe a digitalização de documentos de qualquer natureza que envolva a área da saúde pessoal, seja do próprio usuário ou de um dependente. Isso é realizado por meio de uma aplicação que armazena receitas médicas e resultados de exames em um servidor, criando um histórico completo e acessível. De forma conjunta, o histórico de exames, armazenado em forma de metadados na plataforma, permitirá que médicos tenham acesso a uma ficha completa do paciente, sem depender de documentos físicos ou anotações dispersas.
 
 Essa abordagem possibilita um atendimento mais eficiente e fundamentado, reduzindo o risco de perda de informações importantes e o uso do papel físico, que gera impactos ambientais. Além dos benefícios para o meio ambiente, a gestão digital traz vantagens como a eliminação da necessidade de grandes áreas de arquivamento, maior agilidade na busca por informações, facilidade na atualização de dados, acesso simultâneo por múltiplos usuários e a garantia de cópias de segurança (BARROS, 2013).
-```
+
 
 ## Instalação
 
 1. Utilize `git clone` para colocar o projeto em um ambiente com PHP, Composer e Laravel instalados
 2. Execute o script [setup.sh](./scripts/setup.sh) (ou manualmente execute os comando se estiver em Windows)
-    1. Opcionalmente, configure o arquivo .env com o banco de dados que preferir, conforme a [documentação](https://laravel.com/docs/12.x/database#configuration)
-3. Execute `php artisan migrate:fresh --seed` ou o script [migrate.sh](./scripts/migrate.sh)
+3. Configure os seguintes campos do .env:
+    - `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` — Necessário para endpoints de autenticação com Google
+    - Opcional: Alterar parametros do banco de dados (`DB_*`) para o que preferir, conforme a [documentação](https://laravel.com/docs/12.x/database#configuration)
+4. Execute `php artisan migrate:fresh --seed` ou o script [migrate.sh](./scripts/migrate.sh)
 
 ## Documentação
 
 > Veja [endpoints/list.md](https://gitlab.com/eduardosaraujo11/tcc-minha-saude/-/blob/main/Projeto/Endpoints/list.md)
+
 > Veja [Banco de Dados/script.sql](https://gitlab.com/eduardosaraujo11/tcc-minha-saude/-/blob/main/Projeto/Banco%20de%20Dados/script.sql)
 
 ## Estrutura do projeto

@@ -1,248 +1,228 @@
 <?php
 
-namespace Tests\Feature;
-
-use App\Models\Admin;
-use App\Models\Document;
-use App\Models\Enums\UserAuthMethod;
-use App\Models\Export;
-use App\Models\Share;
-use App\Models\User;
-use DateTime;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Data\Models\Admin;
+use App\Data\Models\Document;
+use App\Data\Models\Export;
+use App\Data\Models\Share;
+use App\Data\Models\User;
+use App\Data\Models\UserAuthMethod;
 use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
 
-class ModelSetupTest extends TestCase
-{
-    use RefreshDatabase;
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-    public function test_user_model_can_be_created_with_all_fields(): void
-    {
-        $userData = [
-            'name' => 'Test User',
-            'cpf' => '123.456.789-00',
-            'metodo_autenticacao' => UserAuthMethod::Email,
-            'email' => 'test@example.com',
-            'data_nascimento' => new DateTime('1990-01-01'),
-            'telefone' => '+55 11 99999-9999',
-        ];
+test('user model can be created with all fields', function () {
+    $userData = [
+        'name' => 'Test User',
+        'cpf' => '123.456.789-00',
+        'metodo_autenticacao' => UserAuthMethod::Email,
+        'email' => 'test@example.com',
+        'data_nascimento' => new DateTime('1990-01-01'),
+        'telefone' => '+55 11 99999-9999',
+    ];
 
-        $user = User::create($userData);
+    $user = User::create($userData);
 
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals($userData['name'], $user->name);
-        $this->assertEquals($userData['cpf'], $user->cpf);
-        $this->assertEquals($userData['email'], $user->email);
-        $this->assertEquals(UserAuthMethod::Email, $user->metodo_autenticacao);
-        $this->assertNotNull($user->id);
-    }
+    expect($user)->toBeInstanceOf(User::class);
+    expect($user->name)->toEqual($userData['name']);
+    expect($user->cpf)->toEqual($userData['cpf']);
+    expect($user->email)->toEqual($userData['email']);
+    expect($user->metodo_autenticacao)->toEqual(UserAuthMethod::Email);
+    expect($user->id)->not->toBeNull();
+});
 
-    public function test_user_has_documents_relationship(): void
-    {
-        $user = User::factory()->create();
-        $documents = Document::factory()->count(3)->forUser($user)->create();
+test('user has documents relationship', function () {
+    $user = User::factory()->create();
+    $documents = Document::factory()->count(3)->forUser($user)->create();
 
-        $this->assertCount(3, $user->documents);
-        $this->assertInstanceOf(Document::class, $user->documents->first());
-    }
+    expect($user->documents)->toHaveCount(3);
+    expect($user->documents->first())->toBeInstanceOf(Document::class);
+});
 
-    public function test_user_has_shares_relationship(): void
-    {
-        $user = User::factory()->create();
-        $shares = Share::factory()->count(2)->forUser($user)->create();
+test('user has shares relationship', function () {
+    $user = User::factory()->create();
+    $shares = Share::factory()->count(2)->forUser($user)->create();
 
-        $this->assertCount(2, $user->shares);
-        $this->assertInstanceOf(Share::class, $user->shares->first());
-    }
+    expect($user->shares)->toHaveCount(2);
+    expect($user->shares->first())->toBeInstanceOf(Share::class);
+});
 
-    public function test_document_model_can_be_created_with_all_fields(): void
-    {
-        $user = User::factory()->create();
-        $documentData = [
-            'titulo' => 'Test Document',
-            'nome_paciente' => 'Patient Name',
-            'nome_medico' => 'Dr. Medical',
-            'tipo_documento' => 'Receita',
-            'data_documento' => now()->subDays(30)->toDate(), // Use Carbon date
-            'is_processing' => true, // Boolean instead of string
-            'caminho_arquivo' => '/path/to/file.pdf',
-            'user_id' => $user->id,
-        ];
+test('document model can be created with all fields', function () {
+    $user = User::factory()->create();
+    $documentData = [
+        'titulo' => 'Test Document',
+        'nome_paciente' => 'Patient Name',
+        'nome_medico' => 'Dr. Medical',
+        'tipo_documento' => 'Receita',
+        'data_documento' => now()->subDays(30)->toDate(), // Use Carbon date
+        'is_processing' => true, // Boolean instead of string
+        'caminho_arquivo' => '/path/to/file.pdf',
+        'user_id' => $user->id,
+    ];
 
-        $document = Document::create($documentData);
+    $document = Document::create($documentData);
 
-        $this->assertInstanceOf(Document::class, $document);
-        $this->assertEquals($documentData['titulo'], $document->titulo);
-        $this->assertTrue($document->is_processing);
-        $this->assertEquals($user->id, $document->user_id);
-        // Test that date casting works properly
-        $this->assertInstanceOf(\Carbon\Carbon::class, $document->data_documento);
-    }
+    expect($document)->toBeInstanceOf(Document::class);
+    expect($document->titulo)->toEqual($documentData['titulo']);
+    expect($document->is_processing)->toBeTrue();
+    expect($document->user_id)->toEqual($user->id);
 
-    public function test_document_belongs_to_user(): void
-    {
-        $user = User::factory()->create();
-        $document = Document::factory()->forUser($user)->create();
+    // Test that date casting works properly
+    expect($document->data_documento)->toBeInstanceOf(\Carbon\Carbon::class);
+});
 
-        $this->assertInstanceOf(User::class, $document->user);
-        $this->assertEquals($user->id, $document->user->id);
-    }
+test('document belongs to user', function () {
+    $user = User::factory()->create();
+    $document = Document::factory()->forUser($user)->create();
 
-    public function test_document_can_have_shares(): void
-    {
-        $user = User::factory()->create();
-        $document = Document::factory()->forUser($user)->create();
-        $share = Share::factory()->forUser($user)->create();
+    expect($document->user)->toBeInstanceOf(User::class);
+    expect($document->user->id)->toEqual($user->id);
+});
 
-        $document->shares()->attach($share);
+test('document can have shares', function () {
+    $user = User::factory()->create();
+    $document = Document::factory()->forUser($user)->create();
+    $share = Share::factory()->forUser($user)->create();
 
-        $this->assertCount(1, $document->shares);
-        $this->assertEquals($share->id, $document->shares->first()->id);
-    }
+    $document->shares()->attach($share);
 
-    public function test_share_model_can_be_created_with_all_fields(): void
-    {
-        $user = User::factory()->create();
-        $shareData = [
-            'codigo' => 'ABC12345',
-            'data_primeiro_uso' => now()->subHours(2), // Use Carbon datetime
-            'expirado' => false, // Boolean instead of string
-            'user_id' => $user->id,
-        ];
+    expect($document->shares)->toHaveCount(1);
+    expect($document->shares->first()->id)->toEqual($share->id);
+});
 
-        $share = Share::create($shareData);
+test('share model can be created with all fields', function () {
+    $user = User::factory()->create();
+    $shareData = [
+        'codigo' => 'ABC12345',
+        'data_primeiro_uso' => now()->subHours(2), // Use Carbon datetime
+        'expirado' => false, // Boolean instead of string
+        'user_id' => $user->id,
+    ];
 
-        $this->assertInstanceOf(Share::class, $share);
-        $this->assertEquals($shareData['codigo'], $share->codigo);
-        $this->assertFalse($share->expirado);
-        $this->assertEquals($user->id, $share->user_id);
-        // Test that datetime casting works properly
-        $this->assertInstanceOf(\Carbon\Carbon::class, $share->data_primeiro_uso);
-    }
+    $share = Share::create($shareData);
 
-    public function test_share_belongs_to_user(): void
-    {
-        $user = User::factory()->create();
-        $share = Share::factory()->forUser($user)->create();
+    expect($share)->toBeInstanceOf(Share::class);
+    expect($share->codigo)->toEqual($shareData['codigo']);
+    expect($share->expirado)->toBeFalse();
+    expect($share->user_id)->toEqual($user->id);
 
-        $this->assertInstanceOf(User::class, $share->user);
-        $this->assertEquals($user->id, $share->user->id);
-    }
+    // Test that datetime casting works properly
+    expect($share->data_primeiro_uso)->toBeInstanceOf(\Carbon\Carbon::class);
+});
 
-    public function test_share_can_have_documents(): void
-    {
-        $user = User::factory()->create();
-        $share = Share::factory()->forUser($user)->create();
-        $document = Document::factory()->forUser($user)->create();
+test('share belongs to user', function () {
+    $user = User::factory()->create();
+    $share = Share::factory()->forUser($user)->create();
 
-        $share->documents()->attach($document);
+    expect($share->user)->toBeInstanceOf(User::class);
+    expect($share->user->id)->toEqual($user->id);
+});
 
-        $this->assertCount(1, $share->documents);
-        $this->assertEquals($document->id, $share->documents->first()->id);
-    }
+test('share can have documents', function () {
+    $user = User::factory()->create();
+    $share = Share::factory()->forUser($user)->create();
+    $document = Document::factory()->forUser($user)->create();
 
-    public function test_admin_model_can_be_created(): void
-    {
-        $adminData = [
-            'username' => 'Admin User',
-            'password' => 'password123',
-        ];
+    $share->documents()->attach($document);
 
-        $admin = Admin::create($adminData);
+    expect($share->documents)->toHaveCount(1);
+    expect($share->documents->first()->id)->toEqual($document->id);
+});
 
-        $this->assertInstanceOf(Admin::class, $admin);
-        $this->assertEquals($adminData['username'], $admin->username);
-    }
+test('admin model can be created', function () {
+    $adminData = [
+        'username' => 'Admin User',
+        'password' => 'password123',
+    ];
 
-    public function test_export_model_can_be_created()
-    {
-        $exportData = [
-            'file_path' => fake()->filePath(),
-            'user_id' => User::factory()->create()->id,
-        ];
-        $export = Export::factory()->create($exportData);
+    $admin = Admin::create($adminData);
 
-        $this->assertInstanceOf(Export::class, $export);
-    }
+    expect($admin)->toBeInstanceOf(Admin::class);
+    expect($admin->username)->toEqual($adminData['username']);
+});
 
-    public function test_models_use_correct_casts(): void
-    {
-        // Test User casts with proper data types
-        $birthDate = now()->subYears(25)->toDate();
-        $user = User::factory()->create([
-            'data_nascimento' => $birthDate,
-            'metodo_autenticacao' => UserAuthMethod::Google, // Use enum instead of string
-        ]);
+test('export model can be created', function () {
+    $exportData = [
+        'file_path' => fake()->filePath(),
+        'user_id' => User::factory()->create()->id,
+    ];
+    $export = Export::factory()->create($exportData);
 
-        // Test Document casts with proper data types
-        $documentDate = now()->subDays(15)->toDate();
-        $document = Document::factory()->create([
-            'is_processing' => true, // Boolean instead of string
-            'data_documento' => $documentDate,
-        ]);
+    expect($export)->toBeInstanceOf(Export::class);
+});
 
-        // Test Share casts with proper data types
-        $firstUseDate = now()->subDays(3);
-        $share = Share::factory()->create([
-            'expirado' => false, // Boolean instead of string
-            'data_primeiro_uso' => $firstUseDate,
-        ]);
+test('models use correct casts', function () {
+    // Test User casts with proper data types
+    $birthDate = now()->subYears(25)->toDate();
+    $user = User::factory()->create([
+        'data_nascimento' => $birthDate,
+        'metodo_autenticacao' => UserAuthMethod::Google, // Use enum instead of string
+    ]);
 
-        // Test User casts
-        $this->assertInstanceOf(\Carbon\Carbon::class, $user->data_nascimento);
-        $this->assertInstanceOf(UserAuthMethod::class, $user->metodo_autenticacao);
-        $this->assertEquals(UserAuthMethod::Google, $user->metodo_autenticacao);
+    // Test Document casts with proper data types
+    $documentDate = now()->subDays(15)->toDate();
+    $document = Document::factory()->create([
+        'is_processing' => true, // Boolean instead of string
+        'data_documento' => $documentDate,
+    ]);
 
-        // Test Document casts
-        $this->assertIsBool($document->is_processing);
-        $this->assertTrue($document->is_processing);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $document->data_documento);
+    // Test Share casts with proper data types
+    $firstUseDate = now()->subDays(3);
+    $share = Share::factory()->create([
+        'expirado' => false, // Boolean instead of string
+        'data_primeiro_uso' => $firstUseDate,
+    ]);
 
-        // Test Share casts
-        $this->assertIsBool($share->expirado);
-        $this->assertFalse($share->expirado);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $share->data_primeiro_uso);
-    }
+    // Test User casts
+    expect($user->data_nascimento)->toBeInstanceOf(\Carbon\Carbon::class);
+    expect($user->metodo_autenticacao)->toBeInstanceOf(UserAuthMethod::class);
+    expect($user->metodo_autenticacao)->toEqual(UserAuthMethod::Google);
 
-    public function test_cast_conversion_from_database_strings(): void
-    {
-        // Test that string values from database are properly cast
-        $user = User::factory()->create();
+    // Test Document casts
+    expect($document->is_processing)->toBeBool();
+    expect($document->is_processing)->toBeTrue();
+    expect($document->data_documento)->toBeInstanceOf(\Carbon\Carbon::class);
 
-        // Simulate database string values by directly updating the database
-        DB::table('users')->where('id', $user->id)->update([
-            'data_nascimento' => '1995-06-15',
-            'metodo_autenticacao' => 'email'
-        ]);
+    // Test Share casts
+    expect($share->expirado)->toBeBool();
+    expect($share->expirado)->toBeFalse();
+    expect($share->data_primeiro_uso)->toBeInstanceOf(\Carbon\Carbon::class);
+});
 
-        // Refresh the model to get values from database
-        $user->refresh();
+test('cast conversion from database strings', function () {
+    // Test that string values from database are properly cast
+    $user = User::factory()->create();
 
-        // Test that strings are properly cast to their respective types
-        $this->assertInstanceOf(\Carbon\Carbon::class, $user->data_nascimento);
-        $this->assertEquals('1995-06-15', $user->data_nascimento->format('Y-m-d'));
-        $this->assertInstanceOf(UserAuthMethod::class, $user->metodo_autenticacao);
-        $this->assertEquals(UserAuthMethod::Email, $user->metodo_autenticacao);
-    }
+    // Simulate database string values by directly updating the database
+    DB::table('users')->where('id', $user->id)->update([
+        'data_nascimento' => '1995-06-15',
+        'metodo_autenticacao' => 'email',
+    ]);
 
-    public function test_boolean_cast_from_database(): void
-    {
-        $document = Document::factory()->create();
-        $share = Share::factory()->create();
+    // Refresh the model to get values from database
+    $user->refresh();
 
-        // Update database with string/numeric boolean representations
-        DB::table('documents')->where('id', $document->id)->update(['is_processing' => '1']);
-        DB::table('shares')->where('id', $share->id)->update(['expirado' => '0']);
+    // Test that strings are properly cast to their respective types
+    expect($user->data_nascimento)->toBeInstanceOf(\Carbon\Carbon::class);
+    expect($user->data_nascimento->format('Y-m-d'))->toEqual('1995-06-15');
+    expect($user->metodo_autenticacao)->toBeInstanceOf(UserAuthMethod::class);
+    expect($user->metodo_autenticacao)->toEqual(UserAuthMethod::Email);
+});
 
-        // Refresh models
-        $document->refresh();
-        $share->refresh();
+test('boolean cast from database', function () {
+    $document = Document::factory()->create();
+    $share = Share::factory()->create();
 
-        // Test proper boolean casting
-        $this->assertIsBool($document->is_processing);
-        $this->assertTrue($document->is_processing);
-        $this->assertIsBool($share->expirado);
-        $this->assertFalse($share->expirado);
-    }
-}
+    // Update database with string/numeric boolean representations
+    DB::table('documents')->where('id', $document->id)->update(['is_processing' => '1']);
+    DB::table('shares')->where('id', $share->id)->update(['expirado' => '0']);
+
+    // Refresh models
+    $document->refresh();
+    $share->refresh();
+
+    // Test proper boolean casting
+    expect($document->is_processing)->toBeBool();
+    expect($document->is_processing)->toBeTrue();
+    expect($share->expirado)->toBeBool();
+    expect($share->expirado)->toBeFalse();
+});
