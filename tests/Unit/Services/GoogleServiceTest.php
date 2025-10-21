@@ -52,7 +52,7 @@ test('gets correct data with valid code', function () {
 
 test('handles invalid code gracefully', function () {
     // Mock the Socialite driver to throw an exception
-    $mockDriver = $this->mock(\Laravel\Socialite\Two\GoogleProvider::class);
+    $mockDriver = $this->mock(GoogleProvider::class);
     $mockDriver->shouldReceive('getAccessTokenResponse')
         ->once()
         ->with('invalid-auth-code')
@@ -79,8 +79,8 @@ test('handles invalid code gracefully', function () {
 
 test('integration with real google api', function () {
     $this->markTestSkipped(
-        'This test requires a fresh OAuth code from Google OAuth Playground. '.
-        'Get one from https://developers.google.com/oauthplayground/ and update the $code variable, '.
+        'This test requires a fresh OAuth code from the mobile app. '.
+        'Get one using the Flutter app debugger, '.
         'then remove this markTestSkipped() line to run the test. '.
         'Remember: Authorization codes expire in 60 seconds and are single-use only!'
     );
