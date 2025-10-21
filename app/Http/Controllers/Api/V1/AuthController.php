@@ -6,10 +6,10 @@ use App\Data\Models\User;
 use App\Domain\Actions\Auth\DTO\RegisterFormData;
 use App\Domain\Actions\Auth\GoogleLogin;
 use App\Domain\Actions\Auth\Register;
+use App\Domain\Actions\Auth\RequestVerificationEmail;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\RegisterRequest;
-use App\Mail\AuthVerificationCode;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -21,22 +21,23 @@ class AuthController extends Controller
     /**
      * Enviar código de login por e-mail
      */
-    public function sendEmail(Request $request)
+    public function sendEmail(Request $request, RequestVerificationEmail $requestVerificationEmail)
     {
-        $request->validate([
+        $validated = $request->validate([
             'email' => 'required|email',
         ]);
 
-        $email = $request->email;
-        $code = (string) rand(100000, 999999);
+        $email = $validated['email'];
 
         // Armazenar no cache por 30 minutos (1800 segundos)
-        Cache::put("login_email_code_{$email}", $code, 1800);
+        $result = $requestVerificationEmail->execute($email);
 
-        Mail::to($email)->send(new AuthVerificationCode($code));
+        if ($result->isFailure()) {
+            abort(500, 'Unexpected error occoured');
+        }
 
         return response()->json([
-            'message' => 'Código enviado ao e-mail.',
+            'status' => 'success',
         ]);
     }
 
