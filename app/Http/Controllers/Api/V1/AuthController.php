@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Data\Models\User;
+use App\Domain\Actions\DTO\RegisterFormData;
 use App\Domain\Actions\GoogleLogin;
+use App\Domain\Actions\Register;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\RegisterRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
@@ -73,9 +77,8 @@ class AuthController extends Controller
         $sessionToken = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'status' => 'success',
-            'is_registered' => true,
-            'session_token' => $sessionToken,
+            'isRegistered' => true,
+            'sessionToken' => $sessionToken,
             'user' => $user,
         ]);
     }
@@ -123,34 +126,39 @@ class AuthController extends Controller
     /**
      * Registrar novo usuário
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request, Register $registerAction)
     {
-        $request->validate([
-            'user.nome_completo' => 'required|string',
-            'user.cpf' => 'required|string|unique:users,cpf',
-            'user.data_nascimento' => 'required|date',
-            'user.telefone' => 'required|string',
-            'user.email' => 'nullable|email|unique:users,email',
-            'register_token' => 'required|string',
-        ]);
+        $data = $request->validated();
+        $userData = $data['user'];
 
-        $userData = $request->user;
+        $registerResult = $registerAction->execute(new RegisterFormData(
+            nome: $userData['nome'],
+            cpf: $userData['cpf'],
+            dataNascimento: Carbon::parse($userData['dataNascimento']),
+            telefone: $userData['telefone'],
+            registerToken: $data['registerToken'],
+        ));
 
-        $user = User::create([
-            'name' => $userData['nome_completo'],
-            'cpf' => $userData['cpf'],
-            'data_nascimento' => $userData['data_nascimento'],
-            'telefone' => $userData['telefone'],
-            'email' => $userData['email'] ?? null,
-            'password' => bcrypt(Str::random(12)),
-        ]);
+        if ($registerResult->isFailure()) {
+            $error = $registerResult->tryGetFailure()?->getMessage();
+            if ($error === ExceptionDictionary::INVALID_REGISTER_TOKEN) {
+                abort(401, ExceptionDictionary::INVALID_REGISTER_TOKEN);
+            }
+            abort(500, $error ?? 'Erro interno no servidor');
+        }
 
-        $sessionToken = $user->createToken('auth_token')->plainTextToken;
+        $register = $registerResult->getOrThrow();
+        $token = $register->sessionToken;
+        $user = $register->user;
 
-        return response()->json([
-            'status' => 'success',
-            'session_token' => $sessionToken,
-            'user' => $user,
-        ]);
+        return [
+            'sessionToken' => $token,
+            'user' => [
+                'nome' => $user->name,
+                'cpf' => $user->cpf,
+                'dataNascimento' => $user->data_nascimento->format('Y-m-d'),
+                'telefone' => $user->telefone,
+            ],
+        ];
     }
 }

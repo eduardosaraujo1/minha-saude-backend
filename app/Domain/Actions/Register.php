@@ -6,6 +6,7 @@ use App\Data\Models\User;
 use App\Data\Models\UserAuthMethod;
 use App\Data\Services\Cache\CacheService;
 use App\Domain\Actions\DTO\RegisterFormData;
+use App\Domain\Actions\DTO\RegisterResult;
 use App\Domain\Exceptions\ExceptionDictionary;
 use App\Utils\Result;
 
@@ -19,7 +20,7 @@ class Register
     /**
      * Executes the Action
      *
-     * @return Result<string, \Exception> session token on success
+     * @return Result<RegisterResult, \Exception> session token on success
      */
     public function execute(RegisterFormData $userData): Result
     {
@@ -46,8 +47,10 @@ class Register
             ]);
             assert($user instanceof User); // intelissense helper
 
-            // Create a session token for the new user and returns it
-            return Result::success($user->createToken('session-token'));
+            // Create a session token for the new user
+            $token = $user->createToken('session-token')->plainTextToken;
+
+            return Result::success(new RegisterResult(sessionToken: $token, user: $user));
         } catch (\Exception $e) {
             return Result::failure($e);
         }

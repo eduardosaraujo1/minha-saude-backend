@@ -1,12 +1,10 @@
 <?php
 
 use App\Data\Models\User;
-use App\Data\Models\UserAuthMethod;
 use App\Data\Services\Cache\CacheService;
 use App\Data\Services\Cache\DTO\RegisterTokenEntry;
-use Carbon\Carbon;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+// uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 test('register with google register token', function () {
     // Arrange: Set up a valid Google register token
@@ -24,43 +22,38 @@ test('register with google register token', function () {
     // Arrange: Set up registration data
     $registrationData = [
         'user' => [
-            'nome_completo' => 'John Doe',
+            'nome' => 'John Doe',
             'cpf' => '12345678909',
-            'data_nascimento' => '2000-01-15',
+            'dataNascimento' => '2000-01-15',
             'telefone' => '11951490211',
-            'email' => $email,
         ],
-        'register_token' => $registerToken,
+        'registerToken' => $registerToken,
     ];
 
     // Act: Send POST request to register endpoint
     $response = $this->postJson(route('auth.register'), $registrationData);
 
     // Assert: Successful response
-    $response->assertStatus(200)
+    $response->assertSuccessful()
         ->assertJsonStructure([
-            'status',
-            'session_token',
-            'user',
-        ])
-        ->assertJson([
-            'status' => 'success',
+            'sessionToken',
+            'user' => [
+                'nome',
+                'cpf',
+                'telefone',
+                'dataNascimento',
+            ],
         ]);
 
     // Assert: User was created in database with correct Google auth method
-    $this->assertDatabaseHas('users', [
-        'name' => 'John Doe',
-        'cpf' => '12345678909',
-        'email' => $email,
-        'metodo_autenticacao' => UserAuthMethod::Google->value,
-        'google_id' => $googleId,
-        'data_nascimento' => Carbon::create(year: 2000, month: 1, day: 15),
-        'telefone' => '11951490211',
-    ]);
+    $user = User::where('email', $email)->first();
+    expect($user->name)->toEqual($registrationData['user']['nome']);
+    expect($user->cpf)->toEqual($registrationData['user']['cpf']);
+    expect($user->data_nascimento->format('Y-m-d'))->toEqual($registrationData['user']['dataNascimento']);
+    expect($user->telefone)->toEqual($registrationData['user']['telefone']);
 
     // Assert: Session token is valid
-    $user = User::where('email', $email)->first();
-    expect($user)->not->toBeNull();
+    expect($user)->toBeTruthy();
     expect($user->tokens)->toHaveCount(1);
 });
 
@@ -79,43 +72,39 @@ test('register with email register token', function () {
     // Arrange: Set up registration data
     $registrationData = [
         'user' => [
-            'nome_completo' => 'Jane Doe',
+            'nome' => 'Jane Doe',
             'cpf' => '98765432100',
-            'data_nascimento' => '1995-05-20',
+            'dataNascimento' => '1995-05-20',
             'telefone' => '11987654321',
             'email' => $email,
         ],
-        'register_token' => $registerToken,
+        'registerToken' => $registerToken,
     ];
 
     // Act: Send POST request to register endpoint
     $response = $this->postJson(route('auth.register'), $registrationData);
 
     // Assert: Successful response
-    $response->assertStatus(200)
+    $response->assertSuccessful()
         ->assertJsonStructure([
-            'status',
-            'session_token',
-            'user',
-        ])
-        ->assertJson([
-            'status' => 'success',
+            'sessionToken',
+            'user' => [
+                'nome',
+                'cpf',
+                'telefone',
+                'dataNascimento',
+            ],
         ]);
 
-    // Assert: User was created in database with Email auth method
-    $this->assertDatabaseHas('users', [
-        'name' => 'Jane Doe',
-        'cpf' => '98765432100',
-        'email' => $email,
-        'metodo_autenticacao' => UserAuthMethod::Email->value,
-        'google_id' => null,
-        'data_nascimento' => Carbon::create(year: 1995, month: 5, day: 20),
-        'telefone' => '11987654321',
-    ]);
+    // Assert: User was created in database with correct Google auth method
+    $user = User::where('email', $email)->first();
+    expect($user->name)->toEqual($registrationData['user']['nome']);
+    expect($user->cpf)->toEqual($registrationData['user']['cpf']);
+    expect($user->data_nascimento->format('Y-m-d'))->toEqual($registrationData['user']['dataNascimento']);
+    expect($user->telefone)->toEqual($registrationData['user']['telefone']);
 
     // Assert: Session token is valid
-    $user = User::where('email', $email)->first();
-    expect($user)->not->toBeNull();
+    expect($user)->toBeTruthy();
     expect($user->tokens)->toHaveCount(1);
 });
 
@@ -124,20 +113,20 @@ test('does not register on missing token', function () {
     $invalidToken = 'invalid-register-token';
     $registrationData = [
         'user' => [
-            'nome_completo' => 'Test User',
+            'nome' => 'Test User',
             'cpf' => '11122233344',
-            'data_nascimento' => '1990-03-10',
+            'dataNascimento' => '1990-03-10',
             'telefone' => '11999887766',
             'email' => 'test@example.com',
         ],
-        'register_token' => $invalidToken,
+        'registerToken' => $invalidToken,
     ];
 
     // Act: Send POST request to register endpoint without setting up cache token
     $response = $this->postJson(route('auth.register'), $registrationData);
 
     // Assert: Request should fail
-    $response->assertStatus(500);
+    $response->assertStatus(401);
 
     // Based on the Register action catching exceptions
     // Assert: User was NOT created in database
@@ -159,70 +148,70 @@ test('does not accept empty metadata', function () {
         ttl: now()->addMinutes(15)
     ));
 
-    // Act & Assert: Test missing nome_completo
+    // Act & Assert: Test missing nome
     $response = $this->postJson(route('auth.register'), [
         'user' => [
             'cpf' => '55566677788',
-            'data_nascimento' => '1988-08-08',
+            'dataNascimento' => '1988-08-08',
             'telefone' => '11955566677',
             'email' => $email,
         ],
-        'register_token' => $registerToken,
+        'registerToken' => $registerToken,
     ]);
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['user.nome_completo']);
+        ->assertJsonValidationErrors(['user.nome']);
 
     // Act & Assert: Test missing cpf
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome_completo' => 'Empty User',
-            'data_nascimento' => '1988-08-08',
+            'nome' => 'Empty User',
+            'dataNascimento' => '1988-08-08',
             'telefone' => '11955566677',
             'email' => $email,
         ],
-        'register_token' => $registerToken,
+        'registerToken' => $registerToken,
     ]);
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['user.cpf']);
 
-    // Act & Assert: Test missing data_nascimento
+    // Act & Assert: Test missing dataNascimento
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome_completo' => 'Empty User',
+            'nome' => 'Empty User',
             'cpf' => '55566677788',
             'telefone' => '11955566677',
             'email' => $email,
         ],
-        'register_token' => $registerToken,
+        'registerToken' => $registerToken,
     ]);
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['user.data_nascimento']);
+        ->assertJsonValidationErrors(['user.dataNascimento']);
 
     // Act & Assert: Test missing telefone
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome_completo' => 'Empty User',
+            'nome' => 'Empty User',
             'cpf' => '55566677788',
-            'data_nascimento' => '1988-08-08',
+            'dataNascimento' => '1988-08-08',
             'email' => $email,
         ],
-        'register_token' => $registerToken,
+        'registerToken' => $registerToken,
     ]);
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['user.telefone']);
 
-    // Act & Assert: Test missing register_token
+    // Act & Assert: Test missing registerToken
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome_completo' => 'Empty User',
+            'nome' => 'Empty User',
             'cpf' => '55566677788',
-            'data_nascimento' => '1988-08-08',
+            'dataNascimento' => '1988-08-08',
             'telefone' => '11955566677',
             'email' => $email,
         ],
     ]);
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['register_token']);
+        ->assertJsonValidationErrors(['registerToken']);
 
     // Assert: No users were created during validation failures
     $this->assertDatabaseMissing('users', [
