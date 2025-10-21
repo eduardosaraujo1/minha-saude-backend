@@ -1,16 +1,7 @@
 <?php
 
-namespace Tests\Feature\Auth;
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class SendEmailCodeTest extends TestCase
-{
-    use RefreshDatabase;
-
-    public function test_can_send_email_code(): void
-    {
-        $this->markTestSkipped('Test not implemented yet.');
-    }
-}
+test('can send email code', function () {
+    $this->markTestSkipped('Test not implemented yet.');
+});
