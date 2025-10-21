@@ -54,7 +54,7 @@ class GoogleLogin
             }
 
             // If user does not exist, generate a register token, store in cache, and return LoginResult indicating not registered
-            $token = "register-$googleId-".Str::random(32);
+            $token = "$googleId-".Str::random(32);
             $this->cacheService->putRegisterToken(new RegisterTokenEntry(
                 token: $token,
                 googleId: $googleId,

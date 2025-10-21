@@ -102,7 +102,7 @@ test('requests registration on unregistered user', function () {
     expect($registerToken)->toBeString();
 
     // Assert: Register token is stored in cache with correct data
-    $cachedEntry = app(CacheService::class)->getRegisterToken($registerToken);
+    $cachedEntry = app(CacheService::class)->getRegisterTokenData($registerToken);
     expect($cachedEntry)->not->toBeNull();
     expect($cachedEntry->email)->toEqual($fakeEmail);
     expect($cachedEntry->googleId)->toEqual($fakeGoogleId);

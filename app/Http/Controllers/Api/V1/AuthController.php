@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Data\Models\User;
 use App\Domain\Actions\Auth\DTO\RegisterFormData;
+use App\Domain\Actions\Auth\EmailLogin;
 use App\Domain\Actions\Auth\GoogleLogin;
 use App\Domain\Actions\Auth\Register;
 use App\Domain\Actions\Auth\RequestVerificationEmail;
@@ -13,8 +13,6 @@ use App\Http\Requests\V1\RegisterRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -44,43 +42,45 @@ class AuthController extends Controller
     /**
      * Login via código de e-mail
      */
-    public function loginEmail(Request $request)
+    public function loginEmail(Request $request, EmailLogin $emailLogin)
     {
         $request->validate([
             'email' => 'required|email',
-            'codigo_email' => 'required|digits:6',
+            'codigoEmail' => 'required|digits:6',
         ]);
 
         $email = $request->email;
-        $code = $request->codigo_email;
+        $code = $request->codigoEmail;
 
-        $cacheKey = "login_email_code_{$email}";
-        $cachedCode = Cache::get($cacheKey);
+        // Attempt auth
+        $result = $emailLogin->execute($email, $code);
 
-        if (! $cachedCode || $cachedCode != $code) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Código inválido',
-            ], 401);
+        if ($result->isFailure()) {
+            $error = $result->tryGetFailure();
+            $message = $error?->getMessage();
+
+            if ($message === ExceptionDictionary::EMAIL_NOT_FOUND) {
+                abort(401, 'Pedido de e-mail não encontrado');
+
+                return;
+            }
+
+            if ($message === ExceptionDictionary::INCORRECT_AUTH_CODE) {
+                abort(401, 'Código inválido');
+
+                return;
+
+            }
+
+            abort(500, 'Erro interno no servidor');
         }
 
-        Cache::forget($cacheKey);
-
-        // Criar usuário se não existir
-        $user = User::firstOrCreate(
-            ['email' => $email],
-            [
-                'name' => 'Usuário',
-                'password' => bcrypt(Str::random(12)),
-            ]
-        );
-
-        $sessionToken = $user->createToken('auth_token')->plainTextToken;
+        $loginResult = $result->getOrThrow();
 
         return response()->json([
-            'isRegistered' => true,
-            'sessionToken' => $sessionToken,
-            'user' => $user,
+            'isRegistered' => $loginResult->isRegistered,
+            'sessionToken' => $loginResult->sessionToken,
+            'registerToken' => $loginResult->registerToken,
         ]);
     }
 

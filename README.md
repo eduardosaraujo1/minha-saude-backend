@@ -6,7 +6,6 @@ O projeto propõe a digitalização de documentos de qualquer natureza que envol
 
 Essa abordagem possibilita um atendimento mais eficiente e fundamentado, reduzindo o risco de perda de informações importantes e o uso do papel físico, que gera impactos ambientais. Além dos benefícios para o meio ambiente, a gestão digital traz vantagens como a eliminação da necessidade de grandes áreas de arquivamento, maior agilidade na busca por informações, facilidade na atualização de dados, acesso simultâneo por múltiplos usuários e a garantia de cópias de segurança (BARROS, 2013).
 
-
 ## Instalação
 
 1. Utilize `git clone` para colocar o projeto em um ambiente com PHP, Composer e Laravel instalados
@@ -15,6 +14,10 @@ Essa abordagem possibilita um atendimento mais eficiente e fundamentado, reduzin
     - `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` — Necessário para endpoints de autenticação com Google
     - Opcional: Alterar parametros do banco de dados (`DB_*`) para o que preferir, conforme a [documentação](https://laravel.com/docs/12.x/database#configuration)
 4. Execute `php artisan migrate:fresh --seed` ou o script [migrate.sh](./scripts/migrate.sh)
+
+## Pipeline CI/CD
+
+-   [Clique aqui](https://sonarqube.etec.dev.br) para ver o resultado da execução do SonarQube
 
 ## Documentação
 

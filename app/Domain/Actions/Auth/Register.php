@@ -26,7 +26,7 @@ class Register
     {
         try {
             // Checks register token in cache to determine user e-mail and google ID
-            $tokenEntry = $this->cacheService->getRegisterToken($userData->registerToken);
+            $tokenEntry = $this->cacheService->getRegisterTokenData($userData->registerToken);
 
             // Cache must be an array with an e-mail field
             if (! $tokenEntry) {

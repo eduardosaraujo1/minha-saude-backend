@@ -2,7 +2,7 @@
 
 namespace App\Domain\Actions\Auth;
 
-use App\Mail\AuthVerificationCode;
+use App\Domain\Mail\AuthVerificationCode;
 use App\Utils\Result;
 use Mail;
 
