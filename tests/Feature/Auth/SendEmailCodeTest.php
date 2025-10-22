@@ -33,7 +33,7 @@ test('actually sends email', function () {
     // Override the mail mailer to use smtp instead of array
     // config(['mail.default' => 'smtp']);
 
-    $email = 'eduardosaraujo1@proton.me';
+    $email = 'tccminhasaude2025@gmail.com';
 
     $response = $this->post(route('auth.send.email'), ['email' => $email]);
 

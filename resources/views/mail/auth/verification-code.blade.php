@@ -13,15 +13,13 @@
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f5f5f5;
         }
 
-        .container {
+        /* .container {
             background-color: #ffffff;
             border-radius: 8px;
-            padding: 40px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+        } */
 
         .header {
             margin-bottom: 30px;
@@ -52,6 +50,7 @@
             padding: 30px;
             text-align: center;
             margin: 30px 0;
+            width: fit-content;
         }
 
         .code {
@@ -94,8 +93,10 @@
             Este é o seu código de verificação único.
         </div>
 
-        <div class="code-container">
-            <div class="code">{{ $code }}</div>
+        <div class="code-wrapper">
+            <div class="code-container">
+                <div class="code">{{ $code }}</div>
+            </div>
         </div>
 
         <div class="expiry-notice">
