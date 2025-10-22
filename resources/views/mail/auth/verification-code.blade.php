@@ -49,7 +49,7 @@
             border-radius: 8px;
             padding: 30px;
             text-align: center;
-            margin: 30px 0;
+            margin: 30px auto;
             width: fit-content;
         }
 
