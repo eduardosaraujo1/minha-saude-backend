@@ -28,8 +28,14 @@ test('can send email code to provided e-mail', function () {
 });
 
 // Debugging: actually send the e-mail
+// To run this test: SEND_REAL_EMAIL=true php artisan test --filter="actually sends email"
 test('actually sends email', function () {
-    $email = 'eduardosaraujo100@gmail.com';
+    // Override the mail mailer to use smtp instead of array
+    // config(['mail.default' => 'smtp']);
 
-    $this->post(route('auth.send.email'), ['email' => $email]);
+    $email = 'eduardosaraujo1@proton.me';
+
+    $response = $this->post(route('auth.send.email'), ['email' => $email]);
+
+    $response->assertSuccessful();
 });
