@@ -12,7 +12,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\RegisterRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class AuthController extends Controller
 {

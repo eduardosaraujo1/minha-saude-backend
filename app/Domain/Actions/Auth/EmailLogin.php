@@ -24,11 +24,11 @@ class EmailLogin
 
             // Guard: ensure code is correct
             if ($result == null) {
-                return Result::failure(ExceptionDictionary::EMAIL_NOT_FOUND);
+                return Result::failure(new \Exception(ExceptionDictionary::EMAIL_NOT_FOUND));
             }
 
             if ($result !== $code) {
-                return Result::failure(ExceptionDictionary::INCORRECT_AUTH_CODE);
+                return Result::failure(new \Exception(ExceptionDictionary::INCORRECT_AUTH_CODE));
             }
 
             // Authenticate: if user exists with this email, log them in; otherwise, return unregistered status
