@@ -43,7 +43,6 @@ class GoogleLogin
 
             // If google id exists in the database, retrieve the user, generate token, and return LoginResult
             $user = User::where('google_id', $googleId)->first();
-            assert($user instanceof User || $user === null); // Improve intelissense
 
             if ($user !== null) {
                 // User exists, generate session token

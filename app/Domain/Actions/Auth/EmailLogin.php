@@ -34,7 +34,6 @@ class EmailLogin
 
             // Authenticate: if user exists with this email, log them in; otherwise, return unregistered status
             $user = User::where('email', $email)->first();
-            assert($user instanceof User || $user === null); // intelissense helper
 
             if ($user) {
                 $sessionToken = $user->createToken(Constants::DEFAULT_SANCTUM_TOKEN_NAME);

@@ -46,7 +46,6 @@ class Register
                 'data_nascimento' => $userData->dataNascimento,
                 'telefone' => $userData->telefone,
             ]);
-            assert($user instanceof User); // intelissense helper
 
             // Create a session token for the new user
             $token = $user->createToken(Constants::DEFAULT_SANCTUM_TOKEN_NAME)->plainTextToken;
