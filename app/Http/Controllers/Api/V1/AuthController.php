@@ -19,6 +19,8 @@ class AuthController extends Controller
 {
     /**
      * Enviar código de login por e-mail
+     *
+     * Etapa intermediária do login via e-mail.
      */
     public function sendEmail(Request $request, RequestVerificationEmail $requestVerificationEmail)
     {
@@ -40,9 +42,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Login via código de e-mail
-     */
     public function loginEmail(Request $request, EmailLogin $emailLogin)
     {
         $request->validate([
@@ -62,14 +61,10 @@ class AuthController extends Controller
 
             if ($message === ExceptionDictionary::EMAIL_NOT_FOUND) {
                 abort(401, 'Pedido de e-mail não encontrado');
-
-                return;
             }
 
             if ($message === ExceptionDictionary::INCORRECT_AUTH_CODE) {
                 abort(401, 'Código inválido');
-
-                return;
             }
 
             abort(500, 'Erro interno no servidor');
@@ -80,9 +75,6 @@ class AuthController extends Controller
         return response()->json($loginResult->toArray());
     }
 
-    /**
-     * Login via Google usando Server Authorization Token
-     */
     public function loginGoogle(Request $request, GoogleLogin $googleLogin)
     {
         $request->validate([
@@ -106,9 +98,6 @@ class AuthController extends Controller
         return $loginResult->getOrThrow()->toArray();
     }
 
-    /**
-     * Logout
-     */
     public function logout(Logout $logoutAction)
     {
         $attempt = $logoutAction->execute();
@@ -123,9 +112,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Registrar novo usuário
-     */
     public function register(RegisterRequest $request, Register $registerAction)
     {
         $data = $request->validated();

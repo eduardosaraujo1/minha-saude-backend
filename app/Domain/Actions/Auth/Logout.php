@@ -17,6 +17,7 @@ class Logout
             $user = auth()->user();
 
             if (! $user) {
+                // obs: this should not happen as the route is protected by auth middleware
                 return Result::failure(new \Exception('No authenticated user found'));
             }
 
