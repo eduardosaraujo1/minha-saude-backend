@@ -60,11 +60,11 @@ class AuthController extends Controller
             $message = $error?->getMessage();
 
             if ($message === ExceptionDictionary::EMAIL_NOT_FOUND) {
-                abort(401, 'Pedido de e-mail não encontrado');
+                abort(400, 'Pedido de e-mail não encontrado');
             }
 
             if ($message === ExceptionDictionary::INCORRECT_AUTH_CODE) {
-                abort(401, 'Código inválido');
+                abort(400, 'Código inválido');
             }
 
             abort(500, 'Erro interno no servidor');
@@ -89,7 +89,7 @@ class AuthController extends Controller
             $message = $error?->getMessage();
 
             if ($message === ExceptionDictionary::INVALID_OAUTH_TOKEN) {
-                abort(401, ExceptionDictionary::INVALID_OAUTH_TOKEN);
+                abort(400, ExceptionDictionary::INVALID_OAUTH_TOKEN);
             } else {
                 abort(500, 'Erro interno no servidor');
             }
@@ -128,7 +128,7 @@ class AuthController extends Controller
         if ($registerResult->isFailure()) {
             $error = $registerResult->tryGetFailure()?->getMessage();
             if ($error === ExceptionDictionary::INVALID_REGISTER_TOKEN) {
-                abort(401, ExceptionDictionary::INVALID_REGISTER_TOKEN);
+                abort(400, ExceptionDictionary::INVALID_REGISTER_TOKEN);
             }
             abort(500, $error ?? 'Erro interno no servidor');
         }
