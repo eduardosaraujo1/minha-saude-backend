@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Domain\Actions\Auth\DTO\RegisterFormData;
 use App\Domain\Actions\Auth\EmailLogin;
 use App\Domain\Actions\Auth\GoogleLogin;
+use App\Domain\Actions\Auth\Logout;
 use App\Domain\Actions\Auth\Register;
 use App\Domain\Actions\Auth\RequestVerificationEmail;
 use App\Domain\Exceptions\ExceptionDictionary;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\RegisterRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Log;
 
 class AuthController extends Controller
 {
@@ -68,7 +70,6 @@ class AuthController extends Controller
                 abort(401, 'Código inválido');
 
                 return;
-
             }
 
             abort(500, 'Erro interno no servidor');
@@ -76,11 +77,7 @@ class AuthController extends Controller
 
         $loginResult = $result->getOrThrow();
 
-        return response()->json([
-            'isRegistered' => $loginResult->isRegistered,
-            'sessionToken' => $loginResult->sessionToken,
-            'registerToken' => $loginResult->registerToken,
-        ]);
+        return response()->json($loginResult->toArray());
     }
 
     /**
@@ -112,14 +109,17 @@ class AuthController extends Controller
     /**
      * Logout
      */
-    public function logout(Request $request)
+    public function logout(Logout $logoutAction)
     {
-        $user = $request->user();
-        $user->tokens()->delete();
+        $attempt = $logoutAction->execute();
+
+        if ($attempt->isFailure()) {
+            Log::warning('Logout failed: may be no authenticated user, which should be caught by the middleware');
+            abort(400, 'Usuário não autenticado');
+        }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Logout realizado com sucesso',
         ]);
     }
 
@@ -148,17 +148,7 @@ class AuthController extends Controller
         }
 
         $register = $registerResult->getOrThrow();
-        $token = $register->sessionToken;
-        $user = $register->user;
 
-        return [
-            'sessionToken' => $token,
-            'user' => [
-                'nome' => $user->name,
-                'cpf' => $user->cpf,
-                'dataNascimento' => $user->data_nascimento->format('Y-m-d'),
-                'telefone' => $user->telefone,
-            ],
-        ];
+        return $register->toArray();
     }
 }

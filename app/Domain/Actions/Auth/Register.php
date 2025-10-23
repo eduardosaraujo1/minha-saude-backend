@@ -8,6 +8,7 @@ use App\Data\Services\Cache\CacheService;
 use App\Domain\Actions\Auth\DTO\RegisterFormData;
 use App\Domain\Actions\Auth\DTO\RegisterResult;
 use App\Domain\Exceptions\ExceptionDictionary;
+use App\Utils\Constants;
 use App\Utils\Result;
 
 /**
@@ -48,7 +49,7 @@ class Register
             assert($user instanceof User); // intelissense helper
 
             // Create a session token for the new user
-            $token = $user->createToken('session-token')->plainTextToken;
+            $token = $user->createToken(Constants::DEFAULT_SANCTUM_TOKEN_NAME)->plainTextToken;
 
             return Result::success(new RegisterResult(sessionToken: $token, user: $user));
         } catch (\Exception $e) {

@@ -15,7 +15,12 @@ class RegisterResult
     {
         return [
             'sessionToken' => $this->sessionToken,
-            'user' => $this->user,
+            'user' => [
+                'nome' => $this->user->name,
+                'cpf' => $this->user->cpf,
+                'dataNascimento' => $this->user->data_nascimento?->format('Y-m-d'),
+                'telefone' => $this->user->telefone,
+            ],
         ];
     }
 }

@@ -16,7 +16,7 @@ class RequestVerificationEmail
     public function execute(string $email): Result
     {
         try {
-            $code = (string) rand(100000, 999999);
+            $code = $this->generateCode();
 
             Mail::to($email)->send(new AuthVerificationCode($code));
 
@@ -24,5 +24,13 @@ class RequestVerificationEmail
         } catch (\Exception $th) {
             return Result::failure($th);
         }
+    }
+
+    private function generateCode(): string
+    {
+        $min = 100000;
+        $max = 999999;
+
+        return (string) random_int($min, $max);
     }
 }

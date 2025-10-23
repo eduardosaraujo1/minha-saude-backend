@@ -2,6 +2,7 @@
 
 use App\Data\Models\User;
 use App\Data\Services\Cache\CacheService;
+use App\Data\Services\Cache\DTO\RegisterTokenEntry;
 
 use function Pest\Laravel\mock;
 
@@ -73,6 +74,37 @@ test('it should fail when an unused e-mail is provided', function () {
     ]);
 
     $response->assertUnauthorized();
+});
+
+test('it should generate register token on unregistered user', function () {
+    $email = 'unregistered@example.com';
+    $code = '123456';
+
+    // Fake 'request register token' request
+    $cacheService = mock(CacheService::class);
+    $cacheService->shouldReceive('getEmailAuthCode')
+        ->with($email)
+        ->andReturn($code);
+    $cacheService->shouldReceive('putRegisterToken')
+        ->once()
+        ->withArgs(function (RegisterTokenEntry $entry) use ($email) {
+            expect($entry->email)->toBe($email);
+            expect(strlen($entry->token))->toBeGreaterThan(10); // at least 10 random chars
+
+            return true;
+        });
+
+    $response = $this->postJson(route('auth.login.email'), [
+        'email' => $email,
+        'codigoEmail' => $code,
+    ]);
+
+    $response->assertSuccessful();
+    $response->assertJsonStructure([
+        'isRegistered',
+        'sessionToken',
+    ]);
+    expect($response['isRegistered'])->toBeFalse();
 });
 
 test('it should fail when no code is provided', function () {

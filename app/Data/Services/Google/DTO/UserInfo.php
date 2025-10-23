@@ -11,6 +11,9 @@ class UserInfo
 
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return [
+            'googleId' => $this->googleId,
+            'email' => $this->email,
+        ];
     }
 }

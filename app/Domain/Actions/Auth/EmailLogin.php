@@ -7,6 +7,7 @@ use App\Data\Services\Cache\CacheService;
 use App\Data\Services\Cache\DTO\RegisterTokenEntry;
 use App\Domain\Actions\Auth\DTO\LoginResult;
 use App\Domain\Exceptions\ExceptionDictionary;
+use App\Utils\Constants;
 use App\Utils\Result;
 use Str;
 
@@ -36,7 +37,7 @@ class EmailLogin
             assert($user instanceof User || $user === null); // intelissense helper
 
             if ($user) {
-                $sessionToken = $user->createToken('session-token');
+                $sessionToken = $user->createToken(Constants::DEFAULT_SANCTUM_TOKEN_NAME);
                 $this->cacheService->clearEmailAuthCode($email);
 
                 return Result::success(LoginResult::successful(
