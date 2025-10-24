@@ -60,11 +60,11 @@ class AuthController extends Controller
             $message = $error?->getMessage();
 
             if ($message === ExceptionDictionary::EMAIL_NOT_FOUND) {
-                abort(400, 'Pedido de e-mail não encontrado');
+                abort(400, 'Código de autenticação expirado');
             }
 
             if ($message === ExceptionDictionary::INCORRECT_AUTH_CODE) {
-                abort(400, 'Código inválido');
+                abort(400, 'Código de autenticação incorreto');
             }
 
             abort(500, 'Erro interno no servidor');
@@ -104,7 +104,7 @@ class AuthController extends Controller
 
         if ($attempt->isFailure()) {
             Log::warning('Logout failed: may be no authenticated user, which should be caught by the middleware');
-            abort(400, 'Usuário não autenticado');
+            abort(403, 'Usuário não autenticado');
         }
 
         return response()->json([
@@ -128,7 +128,7 @@ class AuthController extends Controller
         if ($registerResult->isFailure()) {
             $error = $registerResult->tryGetFailure()?->getMessage();
             if ($error === ExceptionDictionary::INVALID_REGISTER_TOKEN) {
-                abort(400, ExceptionDictionary::INVALID_REGISTER_TOKEN);
+                abort(400, 'Token de registro inválido ou expirado');
             }
             abort(500, $error ?? 'Erro interno no servidor');
         }
