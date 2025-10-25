@@ -56,7 +56,7 @@ test('it should fail when incorrect code is provided', function () {
         'codigoEmail' => $incorrectCode,
     ]);
 
-    $response->assertUnauthorized();
+    $response->assertForbidden();
 });
 
 test('it should fail when an unused e-mail is provided', function () {
@@ -73,7 +73,7 @@ test('it should fail when an unused e-mail is provided', function () {
         'codigoEmail' => $code,
     ]);
 
-    $response->assertUnauthorized();
+    $response->assertClientError();
 });
 
 test('it should generate register token on unregistered user', function () {
