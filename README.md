@@ -36,6 +36,8 @@ cp .env.example .env
 
 Edite o arquivo `.env` e configure os seguintes parâmetros:
 
+> **Observação:** o GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET é geral para o projeto. Peça ao responsável pelo projeto acesso a esses tokens.
+
 ```bash
 # Autenticação com Google (OBRIGATÓRIO)
 GOOGLE_CLIENT_ID=seu_client_id_aqui
@@ -107,22 +109,24 @@ sail npm run build
 
 O projeto está configurado para usar **Dev Containers** (também conhecido como VS Code Remote - Containers), que permite desenvolver diretamente dentro do container Docker. Isso garante que todos os desenvolvedores trabalhem no mesmo ambiente, independentemente do sistema operacional.
 
-##### O que são Dev Containers?
+<details>
+<summary>O que são Dev Containers?</summary>
 
 Dev Containers transformam seu container Docker em um ambiente de desenvolvimento completo, onde:
-- O VS Code roda remotamente dentro do container
-- Todas as extensões, ferramentas e dependências estão pré-configuradas
-- Você edita arquivos diretamente no container (sem sincronização de volumes)
-- Terminal, debugger e testes rodam no ambiente correto
+
+-   O VS Code roda remotamente dentro do container
+-   Todas as extensões, ferramentas e dependências estão pré-configuradas
+-   Você edita arquivos diretamente no container (sem sincronização de volumes)
+-   Terminal, debugger e testes rodam no ambiente correto
 
 ##### Pré-requisitos
 
 1. **VS Code** instalado
 2. **Extensão Dev Containers** instalada:
-   - Abra o VS Code
-   - Acesse Extensions (Ctrl+Shift+X)
-   - Procure por "Dev Containers"
-   - Instale a extensão da Microsoft
+    - Abra o VS Code
+    - Acesse Extensions (Ctrl+Shift+X)
+    - Procure por "Dev Containers"
+    - Instale a extensão da Microsoft
 3. **Docker Desktop** rodando
 
 ##### Como Usar
@@ -174,7 +178,7 @@ npm install
 npm run dev
 ```
 
-
+</details>
 
 #### 7. Veja a aplicação
 
@@ -218,20 +222,13 @@ cd minha-saude-backend
 
 #### 2. Execute o script de configuração
 
-**Linux/macOS:**
+Execute os comandos manualmente ou consulte [setup.sh](./scripts/setup.sh):
 
 ```bash
-chmod +x scripts/setup.sh
-./scripts/setup.sh
-```
-
-**Windows:**
-
-Execute os comandos manualmente:
-
-```bash
-composer install
 cp .env.example .env
+composer install
+npm i
+touch database/database.sqlite # caso esteja usando sqlite
 php artisan key:generate
 ```
 
@@ -267,29 +264,18 @@ DB_PASSWORD=sua_senha
 ```bash
 # Execute as migrations e seeders
 php artisan migrate:fresh --seed
+# Opcional: melhore o assistente de inteligência artificial
+php artisan boost:install
 ```
 
 #### 5. Inicie o servidor
 
 ```bash
 # Servidor de desenvolvimento
-php artisan serve
+composer run dev
 ```
 
 A aplicação estará disponível em: `http://localhost:8000`
-
-### Obtendo Credenciais do Google OAuth
-
-1. Acesse o [Google Cloud Console](https://console.cloud.google.com/)
-2. Crie um novo projeto ou selecione um existente
-3. Navegue para **APIs & Services > Credentials**
-4. Clique em **Create Credentials > OAuth 2.0 Client ID**
-5. Configure a tela de consentimento se solicitado
-6. Selecione **Web application** como tipo
-7. Adicione as URIs de redirecionamento autorizadas:
-    - `http://localhost/auth/google/callback` (para Sail)
-    - `http://localhost:8000/auth/google/callback` (para ambiente local)
-8. Copie o **Client ID** e **Client Secret** para o arquivo `.env`
 
 ### Troubleshooting
 
@@ -313,6 +299,8 @@ A aplicação estará disponível em: `http://localhost:8000`
 sudo chown -R $USER:$USER .
 chmod -R 755 storage bootstrap/cache
 ```
+
+---
 
 ## Pipeline CI/CD
 
