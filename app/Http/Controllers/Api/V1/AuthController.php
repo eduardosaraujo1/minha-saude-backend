@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Data\Models\User;
 use App\Domain\Actions\Auth\DTO\RegisterFormData;
+use App\Domain\Actions\Auth\EmailLogin;
 use App\Domain\Actions\Auth\GoogleLogin;
+use App\Domain\Actions\Auth\Logout;
 use App\Domain\Actions\Auth\Register;
 use App\Domain\Actions\Auth\RequestVerificationEmail;
 use App\Domain\Exceptions\ExceptionDictionary;
@@ -12,14 +13,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\RegisterRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
+use Log;
 
 class AuthController extends Controller
 {
     /**
      * Enviar código de login por e-mail
+     *
+     * Etapa intermediária do login via e-mail.
      */
     public function sendEmail(Request $request, RequestVerificationEmail $requestVerificationEmail)
     {
@@ -41,52 +42,39 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Login via código de e-mail
-     */
-    public function loginEmail(Request $request)
+    public function loginEmail(Request $request, EmailLogin $emailLogin)
     {
         $request->validate([
             'email' => 'required|email',
-            'codigo_email' => 'required|digits:6',
+            'codigoEmail' => 'required|digits:6',
         ]);
 
         $email = $request->email;
-        $code = $request->codigo_email;
+        $code = $request->codigoEmail;
 
-        $cacheKey = "login_email_code_{$email}";
-        $cachedCode = Cache::get($cacheKey);
+        // Attempt auth
+        $result = $emailLogin->execute($email, $code);
 
-        if (! $cachedCode || $cachedCode != $code) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Código inválido',
-            ], 401);
+        if ($result->isFailure()) {
+            $error = $result->tryGetFailure();
+            $message = $error?->getMessage();
+
+            if ($message === ExceptionDictionary::EMAIL_NOT_FOUND) {
+                abort(400, 'Código de autenticação expirado');
+            }
+
+            if ($message === ExceptionDictionary::INCORRECT_AUTH_CODE) {
+                abort(400, 'Código de autenticação incorreto');
+            }
+
+            abort(500, 'Erro interno no servidor');
         }
 
-        Cache::forget($cacheKey);
+        $loginResult = $result->getOrThrow();
 
-        // Criar usuário se não existir
-        $user = User::firstOrCreate(
-            ['email' => $email],
-            [
-                'name' => 'Usuário',
-                'password' => bcrypt(Str::random(12)),
-            ]
-        );
-
-        $sessionToken = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'isRegistered' => true,
-            'sessionToken' => $sessionToken,
-            'user' => $user,
-        ]);
+        return response()->json($loginResult->toArray());
     }
 
-    /**
-     * Login via Google usando Server Authorization Token
-     */
     public function loginGoogle(Request $request, GoogleLogin $googleLogin)
     {
         $request->validate([
@@ -101,7 +89,7 @@ class AuthController extends Controller
             $message = $error?->getMessage();
 
             if ($message === ExceptionDictionary::INVALID_OAUTH_TOKEN) {
-                abort(401, ExceptionDictionary::INVALID_OAUTH_TOKEN);
+                abort(400, ExceptionDictionary::INVALID_OAUTH_TOKEN);
             } else {
                 abort(500, 'Erro interno no servidor');
             }
@@ -110,23 +98,20 @@ class AuthController extends Controller
         return $loginResult->getOrThrow()->toArray();
     }
 
-    /**
-     * Logout
-     */
-    public function logout(Request $request)
+    public function logout(Logout $logoutAction)
     {
-        $user = $request->user();
-        $user->tokens()->delete();
+        $attempt = $logoutAction->execute();
+
+        if ($attempt->isFailure()) {
+            Log::warning('Logout failed: may be no authenticated user, which should be caught by the middleware');
+            abort(403, 'Usuário não autenticado');
+        }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Logout realizado com sucesso',
         ]);
     }
 
-    /**
-     * Registrar novo usuário
-     */
     public function register(RegisterRequest $request, Register $registerAction)
     {
         $data = $request->validated();
@@ -143,23 +128,13 @@ class AuthController extends Controller
         if ($registerResult->isFailure()) {
             $error = $registerResult->tryGetFailure()?->getMessage();
             if ($error === ExceptionDictionary::INVALID_REGISTER_TOKEN) {
-                abort(401, ExceptionDictionary::INVALID_REGISTER_TOKEN);
+                abort(400, 'Token de registro inválido ou expirado');
             }
             abort(500, $error ?? 'Erro interno no servidor');
         }
 
         $register = $registerResult->getOrThrow();
-        $token = $register->sessionToken;
-        $user = $register->user;
 
-        return [
-            'sessionToken' => $token,
-            'user' => [
-                'nome' => $user->name,
-                'cpf' => $user->cpf,
-                'dataNascimento' => $user->data_nascimento->format('Y-m-d'),
-                'telefone' => $user->telefone,
-            ],
-        ];
+        return $register->toArray();
     }
 }

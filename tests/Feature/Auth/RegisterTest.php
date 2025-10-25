@@ -126,7 +126,7 @@ test('does not register on missing token', function () {
     $response = $this->postJson(route('auth.register'), $registrationData);
 
     // Assert: Request should fail
-    $response->assertStatus(401);
+    $response->assertStatus(400);
 
     // Based on the Register action catching exceptions
     // Assert: User was NOT created in database

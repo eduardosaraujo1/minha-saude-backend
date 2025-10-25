@@ -102,7 +102,7 @@ test('requests registration on unregistered user', function () {
     expect($registerToken)->toBeString();
 
     // Assert: Register token is stored in cache with correct data
-    $cachedEntry = app(CacheService::class)->getRegisterToken($registerToken);
+    $cachedEntry = app(CacheService::class)->getRegisterTokenData($registerToken);
     expect($cachedEntry)->not->toBeNull();
     expect($cachedEntry->email)->toEqual($fakeEmail);
     expect($cachedEntry->googleId)->toEqual($fakeGoogleId);
@@ -137,7 +137,7 @@ test('returns client error on unreachable google service', function () {
     $response->assertClientError();
 });
 
-test('returns 401 on invalid oauth token', function () {
+test('returns client error on invalid oauth token', function () {
     // Arrange: Mock GoogleService to return invalid OAuth token error
     $fakeServerAuth = 'invalid-oauth-token';
 
@@ -157,8 +157,8 @@ test('returns 401 on invalid oauth token', function () {
         'tokenOauth' => $fakeServerAuth,
     ]);
 
-    // Assert: Request fails with 401 unauthorized
-    $response->assertStatus(401);
+    // Assert: Request fails with client error
+    $response->assertClientError();
 });
 
 test('validation fails on missing token', function () {

@@ -6,22 +6,22 @@ use Carbon\Carbon;
 
 class RegisterFormData
 {
-    public Carbon $dataNascimento;
-
     public function __construct(
         public string $nome,
         public string $cpf,
-        string|Carbon $dataNascimento,
+        public Carbon $dataNascimento,
         public string $telefone,
         public string $registerToken
-    ) {
-        $this->dataNascimento = $dataNascimento instanceof Carbon
-            ? $dataNascimento
-            : Carbon::parse($dataNascimento);
-    }
+    ) {}
 
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return [
+            'nome' => $this->nome,
+            'cpf' => $this->cpf,
+            'data_nascimento' => $this->dataNascimento->format('Y-m-d'),
+            'telefone' => $this->telefone,
+            'register_token' => $this->registerToken,
+        ];
     }
 }

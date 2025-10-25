@@ -22,6 +22,10 @@ class LoginResult
 
     public function toArray(): array
     {
-        return get_object_vars($this);
+        return [
+            'isRegistered' => $this->isRegistered,
+            'sessionToken' => $this->sessionToken,
+            'registerToken' => $this->registerToken,
+        ];
     }
 }

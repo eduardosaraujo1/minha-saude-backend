@@ -11,11 +11,9 @@ class GoogleServiceImpl implements GoogleService
     public function getUserInfo(string $oauthToken): Result
     {
         try {
-            // phpcs:ignore
-            $driver = Socialite::driver('google')->stateless();
-
-            // Improve intelissense
-            assert($driver instanceof \Laravel\Socialite\Two\GoogleProvider);
+            $driver = Socialite::driver('google');
+            assert($driver instanceof \Laravel\Socialite\Two\GoogleProvider); // Improve intelissense
+            $driver = $driver->stateless();
 
             // Android server auth codes (from authorizeServer()) don't use a redirect_uri
             // Pass empty string to ensure Socialite omits the redirect_uri parameter

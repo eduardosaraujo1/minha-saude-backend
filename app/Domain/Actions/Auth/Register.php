@@ -8,6 +8,7 @@ use App\Data\Services\Cache\CacheService;
 use App\Domain\Actions\Auth\DTO\RegisterFormData;
 use App\Domain\Actions\Auth\DTO\RegisterResult;
 use App\Domain\Exceptions\ExceptionDictionary;
+use App\Utils\Constants;
 use App\Utils\Result;
 
 /**
@@ -26,7 +27,7 @@ class Register
     {
         try {
             // Checks register token in cache to determine user e-mail and google ID
-            $tokenEntry = $this->cacheService->getRegisterToken($userData->registerToken);
+            $tokenEntry = $this->cacheService->getRegisterTokenData($userData->registerToken);
 
             // Cache must be an array with an e-mail field
             if (! $tokenEntry) {
@@ -45,10 +46,9 @@ class Register
                 'data_nascimento' => $userData->dataNascimento,
                 'telefone' => $userData->telefone,
             ]);
-            assert($user instanceof User); // intelissense helper
 
             // Create a session token for the new user
-            $token = $user->createToken('session-token')->plainTextToken;
+            $token = $user->createToken(Constants::DEFAULT_SANCTUM_TOKEN_NAME)->plainTextToken;
 
             return Result::success(new RegisterResult(sessionToken: $token, user: $user));
         } catch (\Exception $e) {

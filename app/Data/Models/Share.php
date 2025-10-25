@@ -7,6 +7,30 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property int $id
+ * @property string $codigo
+ * @property \Illuminate\Support\Carbon|null $data_primeiro_uso
+ * @property bool $expirado
+ * @property int $user_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Data\Models\Document> $documents
+ * @property-read int|null $documents_count
+ * @property-read \App\Data\Models\User $user
+ * @method static \Database\Factories\ShareFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share whereCodigo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share whereDataPrimeiroUso($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share whereExpirado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Share whereUserId($value)
+ * @mixin \Eloquent
+ */
 class Share extends Model
 {
     /** @use HasFactory<\Database\Factories\ShareFactory> */

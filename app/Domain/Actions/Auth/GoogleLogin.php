@@ -8,6 +8,7 @@ use App\Data\Services\Cache\DTO\RegisterTokenEntry;
 use App\Data\Services\Google\GoogleService;
 use App\Domain\Actions\Auth\DTO\LoginResult;
 use App\Domain\Exceptions\ExceptionDictionary;
+use App\Utils\Constants;
 use App\Utils\Result;
 use Str;
 
@@ -36,17 +37,16 @@ class GoogleLogin
                 return Result::failure(new \Exception(ExceptionDictionary::INVALID_OAUTH_TOKEN));
             }
 
-            $UserInfo = $exchangeResult->getOrThrow();
-            $googleId = $UserInfo->googleId;
-            $email = $UserInfo->email;
+            $userInfo = $exchangeResult->getOrThrow();
+            $googleId = $userInfo->googleId;
+            $email = $userInfo->email;
 
             // If google id exists in the database, retrieve the user, generate token, and return LoginResult
             $user = User::where('google_id', $googleId)->first();
-            assert($user instanceof User || $user === null); // Improve intelissense
 
             if ($user !== null) {
                 // User exists, generate session token
-                $sessionToken = $user->createToken('session-token')->plainTextToken;
+                $sessionToken = $user->createToken(Constants::DEFAULT_SANCTUM_TOKEN_NAME)->plainTextToken;
 
                 return Result::success(LoginResult::successful(
                     token: $sessionToken,
@@ -54,7 +54,7 @@ class GoogleLogin
             }
 
             // If user does not exist, generate a register token, store in cache, and return LoginResult indicating not registered
-            $token = "register-$googleId-".Str::random(32);
+            $token = "$googleId-".Str::random(32);
             $this->cacheService->putRegisterToken(new RegisterTokenEntry(
                 token: $token,
                 googleId: $googleId,
