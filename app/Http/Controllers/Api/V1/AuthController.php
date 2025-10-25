@@ -64,10 +64,10 @@ class AuthController extends Controller
             }
 
             if ($message === ExceptionDictionary::INCORRECT_AUTH_CODE) {
-                abort(400, 'Código de autenticação incorreto');
+                abort(403, 'Código de autenticação incorreto');
             }
 
-            abort(500, 'Erro interno no servidor');
+            abort(500);
         }
 
         $loginResult = $result->getOrThrow();
