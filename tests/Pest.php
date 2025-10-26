@@ -47,5 +47,6 @@ expect()->extend('toBeOne', function () {
 
 function something()
 {
-    // ..
+    // Function here as example.
+    // Implement your helper logic if needed.
 }

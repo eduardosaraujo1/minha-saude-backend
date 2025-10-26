@@ -32,7 +32,7 @@ test('user model can be created with all fields', function () {
 
 test('user has documents relationship', function () {
     $user = User::factory()->create();
-    $documents = Document::factory()->count(3)->forUser($user)->create();
+    Document::factory()->count(3)->forUser($user)->create();
 
     expect($user->documents)->toHaveCount(3);
     expect($user->documents->first())->toBeInstanceOf(Document::class);
@@ -40,7 +40,7 @@ test('user has documents relationship', function () {
 
 test('user has shares relationship', function () {
     $user = User::factory()->create();
-    $shares = Share::factory()->count(2)->forUser($user)->create();
+    Share::factory()->count(2)->forUser($user)->create();
 
     expect($user->shares)->toHaveCount(2);
     expect($user->shares->first())->toBeInstanceOf(Share::class);

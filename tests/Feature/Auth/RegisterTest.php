@@ -4,8 +4,6 @@ use App\Data\Models\User;
 use App\Data\Services\Cache\CacheService;
 use App\Data\Services\Cache\DTO\RegisterTokenEntry;
 
-// uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 test('register with google register token', function () {
     // Arrange: Set up a valid Google register token
     $registerToken = 'fake-google-register-token';
@@ -140,6 +138,10 @@ test('does not accept empty metadata', function () {
     // Arrange: Set up a valid register token
     $registerToken = 'valid-token-empty-metadata';
     $email = 'empty@example.com';
+    $fakeCpf = '55566677788';
+    $fakeName = 'Empty User';
+    $fakeDtNascimento = '1988-08-08';
+    $fakePhone = '11955566677';
 
     app(CacheService::class)->putRegisterToken(new RegisterTokenEntry(
         token: $registerToken,
@@ -151,9 +153,9 @@ test('does not accept empty metadata', function () {
     // Act & Assert: Test missing nome
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'cpf' => '55566677788',
-            'dataNascimento' => '1988-08-08',
-            'telefone' => '11955566677',
+            'cpf' => $fakeCpf,
+            'dataNascimento' => $fakeDtNascimento,
+            'telefone' => $fakePhone,
             'email' => $email,
         ],
         'registerToken' => $registerToken,
@@ -164,9 +166,9 @@ test('does not accept empty metadata', function () {
     // Act & Assert: Test missing cpf
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome' => 'Empty User',
-            'dataNascimento' => '1988-08-08',
-            'telefone' => '11955566677',
+            'nome' => $fakeName,
+            'dataNascimento' => $fakeDtNascimento,
+            'telefone' => $fakePhone,
             'email' => $email,
         ],
         'registerToken' => $registerToken,
@@ -177,9 +179,9 @@ test('does not accept empty metadata', function () {
     // Act & Assert: Test missing dataNascimento
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome' => 'Empty User',
-            'cpf' => '55566677788',
-            'telefone' => '11955566677',
+            'nome' => $fakeName,
+            'cpf' => $fakeCpf,
+            'telefone' => $fakePhone,
             'email' => $email,
         ],
         'registerToken' => $registerToken,
@@ -190,9 +192,9 @@ test('does not accept empty metadata', function () {
     // Act & Assert: Test missing telefone
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome' => 'Empty User',
-            'cpf' => '55566677788',
-            'dataNascimento' => '1988-08-08',
+            'nome' => $fakeName,
+            'cpf' => $fakeCpf,
+            'dataNascimento' => $fakeDtNascimento,
             'email' => $email,
         ],
         'registerToken' => $registerToken,
@@ -203,10 +205,10 @@ test('does not accept empty metadata', function () {
     // Act & Assert: Test missing registerToken
     $response = $this->postJson(route('auth.register'), [
         'user' => [
-            'nome' => 'Empty User',
-            'cpf' => '55566677788',
-            'dataNascimento' => '1988-08-08',
-            'telefone' => '11955566677',
+            'nome' => $fakeName,
+            'cpf' => $fakeCpf,
+            'dataNascimento' => $fakeDtNascimento,
+            'telefone' => $fakePhone,
             'email' => $email,
         ],
     ]);
