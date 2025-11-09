@@ -22,6 +22,8 @@ Route::prefix('v1')->group(function () {
         ->name('auth.register');
     Route::post('/auth/send-email', [AuthController::class, 'sendEmail'])
         ->name('auth.send.email');
+    Route::post('/auth/reauthenticate', [AuthController::class, 'reauthenticate'])
+        ->name('auth.reauthenticate');
     Route::post('/auth/logout', [AuthController::class, 'logout'])
         ->middleware('auth:sanctum')
         ->name('auth.logout');
