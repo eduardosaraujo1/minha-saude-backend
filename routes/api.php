@@ -48,6 +48,9 @@ Route::prefix('v1')->group(function () {
         Route::put('/documents/{id}', [DocumentController::class, 'update']);
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
         Route::post('/documents/{id}/download', [DocumentController::class, 'download']);
+        Route::post('/documents/export', function () {
+            return response()->json(['status' => 'not_implemented']);
+        });
     });
 
     // Trash routes
@@ -64,12 +67,5 @@ Route::prefix('v1')->group(function () {
         Route::get('/shares', [ShareController::class, 'index']);
         Route::get('/shares/{code}', [ShareController::class, 'show']);
         Route::delete('/shares/{code}', [ShareController::class, 'destroy']);
-    });
-
-    // Export routes
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/export/generate', function () {
-            return response()->json(['status' => 'not_implemented']);
-        });
     });
 });
