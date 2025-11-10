@@ -1,11 +1,11 @@
 <?php
 
-use App\Data\Models\User;
-use App\Data\Models\UserAuthMethod;
-use App\Data\Services\Cache\CacheService;
-use App\Data\Services\Google\DTO\UserInfo;
-use App\Data\Services\Google\GoogleService;
-use App\Domain\Exceptions\ExceptionDictionary;
+use App\Http\Exceptions\ApiException;
+use App\Modules\User\DTOs\Auth\UserAuthMethod;
+use App\Modules\User\DTOs\Google\UserInfo;
+use App\Modules\User\Models\User;
+use App\Modules\User\Services\Ports\CacheServicePort;
+use App\Modules\User\Services\Ports\GoogleServicePort;
 use App\Utils\Result;
 
 test('google login authenticates user', function () {
@@ -21,7 +21,7 @@ test('google login authenticates user', function () {
 
     // Arrange: Mock GoogleService to return user info for existing user
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($user, $fakeGoogleId, $fakeServerAuth) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
@@ -66,7 +66,7 @@ test('requests registration on unregistered user', function () {
     $fakeEmail = 'newuser@example.com';
 
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($fakeServerAuth, $fakeGoogleId, $fakeEmail) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
@@ -102,7 +102,7 @@ test('requests registration on unregistered user', function () {
     expect($registerToken)->toBeString();
 
     // Assert: Register token is stored in cache with correct data
-    $cachedEntry = app(CacheService::class)->getRegisterTokenData($registerToken);
+    $cachedEntry = app(CacheServicePort::class)->getRegisterTokenData($registerToken);
     expect($cachedEntry)->not->toBeNull();
     expect($cachedEntry->email)->toEqual($fakeEmail);
     expect($cachedEntry->googleId)->toEqual($fakeGoogleId);
@@ -119,7 +119,7 @@ test('returns client error on unreachable google service', function () {
     $fakeServerAuth = 'invalid-oauth-token';
 
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($fakeServerAuth) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
@@ -142,13 +142,13 @@ test('returns client error on invalid oauth token', function () {
     $fakeServerAuth = 'invalid-oauth-token';
 
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($fakeServerAuth) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
                 ->with($fakeServerAuth)
                 ->andReturn(Result::failure(
-                    new \Exception(ExceptionDictionary::INVALID_OAUTH_TOKEN)
+                    ApiException::invalidOauthToken()
                 ));
         });
 

@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Data\Models\Document;
-use App\Data\Models\User;
+use App\Modules\Document\Models\Document;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Data\Models\Document>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\Document\Models\Document>
  */
 class DocumentFactory extends Factory
 {

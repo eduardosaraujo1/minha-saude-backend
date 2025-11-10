@@ -2452,7 +2452,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get the currently authenticated user.
          *
-         * @return \App\Data\Models\User|null
+         * @return \App\Modules\User\Models\User|null
          * @static
          */
         public static function user()
@@ -2490,7 +2490,7 @@ namespace Illuminate\Support\Facades {
          * Log the given user ID into the application without sessions or cookies.
          *
          * @param mixed $id
-         * @return \App\Data\Models\User|false
+         * @return \App\Modules\User\Models\User|false
          * @static
          */
         public static function onceUsingId($id)
@@ -2576,7 +2576,7 @@ namespace Illuminate\Support\Facades {
          *
          * @param mixed $id
          * @param bool $remember
-         * @return \App\Data\Models\User|false
+         * @return \App\Modules\User\Models\User|false
          * @static
          */
         public static function loginUsingId($id, $remember = false)
@@ -2631,7 +2631,7 @@ namespace Illuminate\Support\Facades {
          * The application must be using the AuthenticateSession middleware.
          *
          * @param string $password
-         * @return \App\Data\Models\User|null
+         * @return \App\Modules\User\Models\User|null
          * @throws \Illuminate\Auth\AuthenticationException
          * @static
          */
@@ -2657,7 +2657,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Get the last user we attempted to authenticate.
          *
-         * @return \App\Data\Models\User
+         * @return \App\Modules\User\Models\User
          * @static
          */
         public static function getLastAttempted()
@@ -2781,7 +2781,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Return the currently cached user.
          *
-         * @return \App\Data\Models\User|null
+         * @return \App\Modules\User\Models\User|null
          * @static
          */
         public static function getUser()
@@ -2843,7 +2843,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Determine if the current user is authenticated. If not, throw an exception.
          *
-         * @return \App\Data\Models\User
+         * @return \App\Modules\User\Models\User
          * @throws \Illuminate\Auth\AuthenticationException
          * @static
          */
@@ -5177,7 +5177,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function lock($name, $seconds = 0, $owner = null)
         {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            /** @var \Illuminate\Cache\MemcachedStore $instance */
             return $instance->lock($name, $seconds, $owner);
         }
 
@@ -5191,21 +5191,8 @@ namespace Illuminate\Support\Facades {
          */
         public static function restoreLock($name, $owner)
         {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            /** @var \Illuminate\Cache\MemcachedStore $instance */
             return $instance->restoreLock($name, $owner);
-        }
-
-        /**
-         * Remove an item from the cache if it is expired.
-         *
-         * @param string $key
-         * @return bool
-         * @static
-         */
-        public static function forgetIfExpired($key)
-        {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
-            return $instance->forgetIfExpired($key);
         }
 
         /**
@@ -5216,58 +5203,20 @@ namespace Illuminate\Support\Facades {
          */
         public static function flush()
         {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            /** @var \Illuminate\Cache\MemcachedStore $instance */
             return $instance->flush();
         }
 
         /**
-         * Get the underlying database connection.
+         * Get the underlying Memcached connection.
          *
-         * @return \Illuminate\Database\MySqlConnection
+         * @return \Memcached
          * @static
          */
-        public static function getConnection()
+        public static function getMemcached()
         {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
-            return $instance->getConnection();
-        }
-
-        /**
-         * Set the underlying database connection.
-         *
-         * @param \Illuminate\Database\ConnectionInterface $connection
-         * @return \Illuminate\Cache\DatabaseStore
-         * @static
-         */
-        public static function setConnection($connection)
-        {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
-            return $instance->setConnection($connection);
-        }
-
-        /**
-         * Get the connection used to manage locks.
-         *
-         * @return \Illuminate\Database\MySqlConnection
-         * @static
-         */
-        public static function getLockConnection()
-        {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
-            return $instance->getLockConnection();
-        }
-
-        /**
-         * Specify the connection that should be used to manage locks.
-         *
-         * @param \Illuminate\Database\ConnectionInterface $connection
-         * @return \Illuminate\Cache\DatabaseStore
-         * @static
-         */
-        public static function setLockConnection($connection)
-        {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
-            return $instance->setLockConnection($connection);
+            /** @var \Illuminate\Cache\MemcachedStore $instance */
+            return $instance->getMemcached();
         }
 
         /**
@@ -5278,7 +5227,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function getPrefix()
         {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            /** @var \Illuminate\Cache\MemcachedStore $instance */
             return $instance->getPrefix();
         }
 
@@ -5291,7 +5240,7 @@ namespace Illuminate\Support\Facades {
          */
         public static function setPrefix($prefix)
         {
-            /** @var \Illuminate\Cache\DatabaseStore $instance */
+            /** @var \Illuminate\Cache\MemcachedStore $instance */
             $instance->setPrefix($prefix);
         }
 

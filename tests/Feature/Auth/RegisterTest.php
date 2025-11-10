@@ -1,8 +1,8 @@
 <?php
 
-use App\Data\Models\User;
-use App\Data\Services\Cache\CacheService;
-use App\Data\Services\Cache\DTO\RegisterTokenEntry;
+use App\Modules\User\DTOs\Cache\RegisterTokenEntry;
+use App\Modules\User\Models\User;
+use App\Modules\User\Services\Ports\CacheServicePort;
 
 test('register with google register token', function () {
     // Arrange: Set up a valid Google register token
@@ -10,7 +10,7 @@ test('register with google register token', function () {
     $googleId = '2187438292';
     $email = 'john.doe@gmail.com';
 
-    app(CacheService::class)->putRegisterToken(new RegisterTokenEntry(
+    app(CacheServicePort::class)->putRegisterToken(new RegisterTokenEntry(
         token: $registerToken,
         email: $email,
         googleId: $googleId,
@@ -60,7 +60,7 @@ test('register with email register token', function () {
     $registerToken = 'fake-email-register-token';
     $email = 'jane.doe@example.com';
 
-    app(CacheService::class)->putRegisterToken(new RegisterTokenEntry(
+    app(CacheServicePort::class)->putRegisterToken(new RegisterTokenEntry(
         token: $registerToken,
         email: $email,
         googleId: null,
@@ -143,7 +143,7 @@ test('does not accept empty metadata', function () {
     $fakeDtNascimento = '1988-08-08';
     $fakePhone = '11955566677';
 
-    app(CacheService::class)->putRegisterToken(new RegisterTokenEntry(
+    app(CacheServicePort::class)->putRegisterToken(new RegisterTokenEntry(
         token: $registerToken,
         email: $email,
         googleId: null,

@@ -1,11 +1,11 @@
 <?php
 
-use App\Data\Models\Admin;
-use App\Data\Models\Document;
-use App\Data\Models\Export;
-use App\Data\Models\Share;
-use App\Data\Models\User;
-use App\Data\Models\UserAuthMethod;
+use App\Modules\Admin\Models\Admin;
+use App\Modules\Document\Models\Document;
+use App\Modules\Document\Models\Export;
+use App\Modules\Share\Models\Share;
+use App\Modules\User\DTOs\Auth\UserAuthMethod;
+use App\Modules\User\Models\User;
 use Illuminate\Support\Facades\DB;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);

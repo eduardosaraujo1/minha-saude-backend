@@ -1,8 +1,8 @@
 <?php
 
-use App\Data\Models\User;
-use App\Data\Services\Cache\CacheService;
-use App\Data\Services\Cache\DTO\RegisterTokenEntry;
+use App\Modules\User\DTOs\Cache\RegisterTokenEntry;
+use App\Modules\User\Models\User;
+use App\Modules\User\Services\Ports\CacheServicePort;
 
 use function Pest\Laravel\mock;
 
@@ -19,7 +19,7 @@ test('it should succeed when the correct code is provided', function () {
     $email = 'user@example.com';
     $code = '123456';
 
-    $cacheService = mock(CacheService::class);
+    $cacheService = mock(CacheServicePort::class);
     $cacheService->shouldReceive('getEmailAuthCode')
         ->with($email)
         ->andReturn($code);
@@ -46,7 +46,7 @@ test('it should fail when incorrect code is provided', function () {
     $correctCode = '123456';
     $incorrectCode = '654321';
 
-    $cacheService = mock(CacheService::class);
+    $cacheService = mock(CacheServicePort::class);
     $cacheService->shouldReceive('getEmailAuthCode')
         ->with($email)
         ->andReturn($correctCode);
@@ -63,7 +63,7 @@ test('it should fail when an unused e-mail is provided', function () {
     $email = 'unused@example.com';
     $code = '123456';
 
-    $cacheService = mock(CacheService::class);
+    $cacheService = mock(CacheServicePort::class);
     $cacheService->shouldReceive('getEmailAuthCode')
         ->with($email)
         ->andReturn(null);
@@ -81,7 +81,7 @@ test('it should generate register token on unregistered user', function () {
     $code = '123456';
 
     // Fake 'request register token' request
-    $cacheService = mock(CacheService::class);
+    $cacheService = mock(CacheServicePort::class);
     $cacheService->shouldReceive('getEmailAuthCode')
         ->with($email)
         ->andReturn($code);

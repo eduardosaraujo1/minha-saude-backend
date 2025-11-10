@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Data\Models\Share;
-use App\Data\Models\User;
+use App\Modules\Share\Models\Share;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Data\Models\Share>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\Share\Models\Share>
  */
 class ShareFactory extends Factory
 {
