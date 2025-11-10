@@ -30,6 +30,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(FileStoragePort::class, function ($app) {
             return new LocalFileStorageAdapter;
         });
+
+        $this->app->singleton(\App\Modules\Share\Services\Ports\ShareCodeStorePort::class, function ($app) {
+            return new \App\Modules\Share\Services\Adapters\CacheShareCodeStoreAdapter;
+        });
     }
 
     /**

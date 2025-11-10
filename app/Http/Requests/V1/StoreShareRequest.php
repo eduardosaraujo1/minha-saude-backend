@@ -11,7 +11,7 @@ class StoreShareRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,8 @@ class StoreShareRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'idsDocumentos' => ['required', 'array', 'min:1'],
+            'idsDocumentos.*' => ['required', 'integer', 'exists:documents,id'],
         ];
     }
 }
