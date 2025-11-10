@@ -16,13 +16,13 @@
 ### Folder structure
 
 ```
-/[MODULE_NAME]
-|--- Domain
-    |--- Actions
-    |--- DTO
-|--- Data
+/{MODULE_NAME}
+|--- DTOs
+|--- Models
+|--- Logic
+|--- Services
     |--- Adapters
     |--- Ports
-    |--- Models
-|--- Logic
+|--- UseCases
+|--- {ModuleName}Module.php
 ```
