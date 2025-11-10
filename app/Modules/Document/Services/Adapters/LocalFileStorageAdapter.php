@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Storage;
 
 class LocalFileStorageAdapter implements FileStoragePort
 {
+    /**
+     * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $content
+     * @return bool|string
+     */
     public function store(string $userId, string $uuid, mixed $content): bool
     {
         $path = $this->buildPath($userId, $uuid);

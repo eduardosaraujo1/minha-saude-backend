@@ -58,4 +58,14 @@ class UserModule
     {
         return app(UseCases\RequestVerificationEmail::class)->execute($email);
     }
+
+    /**
+     * Reauthenticate user
+     *
+     * @return Result<DTOs\Auth\ReauthenticateResult, \App\Http\Exceptions\ApiException>
+     */
+    public function reauthenticate(DTOs\Auth\ReauthenticateFormData $data): Result
+    {
+        return app(UseCases\Reauthenticate::class)->execute($data);
+    }
 }

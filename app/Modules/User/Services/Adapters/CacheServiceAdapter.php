@@ -84,4 +84,43 @@ class CacheServiceAdapter implements CacheServicePort
             Log::error('Error during cache deletion: '.$th->getMessage(), [$th]);
         }
     }
+
+    public function putReauthenticateToken(string $userId, string $token, ?DateTime $ttl): void
+    {
+        try {
+            Cache::put("reauth-$token", $userId, $ttl ?? now()->addMinutes(15));
+        } catch (\Throwable $th) {
+            Log::error('Error during cache storage: '.$th->getMessage(), [$th]);
+
+            return;
+        }
+    }
+
+    public function getReauthenticateToken(string $token): ?string
+    {
+        try {
+            $userId = Cache::get("reauth-$token");
+
+            if (! is_string($userId)) {
+                Log::warning('Unexpected type found when querying for reauth token. Presuming it was never set.');
+
+                return null;
+            }
+
+            return $userId;
+        } catch (\Throwable $th) {
+            Log::error('Error during cache retrieval: '.$th->getMessage(), [$th]);
+
+            return null;
+        }
+    }
+
+    public function clearReauthenticateToken(string $token): void
+    {
+        try {
+            Cache::delete("reauth-$token");
+        } catch (\Throwable $th) {
+            Log::error('Error during cache deletion: '.$th->getMessage(), [$th]);
+        }
+    }
 }

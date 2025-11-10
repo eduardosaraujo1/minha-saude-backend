@@ -46,4 +46,28 @@ interface CacheServicePort
      * Used for comparing the code provided by the user to the code sent by the server
      */
     public function clearEmailAuthCode(string $email): void;
+
+    /**
+     * Stores a reauthenticate token in cache for temporary access verification
+     *
+     * @param  string  $userId  The user ID associated with this token
+     * @param  string  $token  The reauthenticate token
+     * @param  DateTime|null  $ttl  Time to live for the token (defaults to 15 minutes)
+     */
+    public function putReauthenticateToken(string $userId, string $token, ?DateTime $ttl): void;
+
+    /**
+     * Gets the user ID associated with a reauthenticate token
+     *
+     * @param  string  $token  The reauthenticate token
+     * @return string|null The user ID or null if token not found/expired
+     */
+    public function getReauthenticateToken(string $token): ?string;
+
+    /**
+     * Clears a reauthenticate token from cache
+     *
+     * @param  string  $token  The reauthenticate token to remove
+     */
+    public function clearReauthenticateToken(string $token): void;
 }

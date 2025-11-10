@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\ReauthenticateRequest;
 use App\Http\Requests\V1\RegisterRequest;
 use App\Modules\User\DTOs\Auth\RegisterFormData;
 use App\Modules\User\UserModule;
@@ -118,5 +119,24 @@ class AuthController extends Controller
         $register = $registerResult->getOrThrow();
 
         return $register->toArray();
+    }
+
+    public function reauthenticate(ReauthenticateRequest $request, UserModule $userModule)
+    {
+        $validated = $request->validated();
+
+        $formData = \App\Modules\User\DTOs\Auth\ReauthenticateFormData::fromRequest($validated);
+
+        $result = $userModule->reauthenticate($formData);
+
+        if ($result->isFailure()) {
+            $error = $result->tryGetFailure();
+
+            abort($error->code, $error->message);
+        }
+
+        $reauthResult = $result->getOrThrow();
+
+        return response()->json($reauthResult->toArray());
     }
 }
