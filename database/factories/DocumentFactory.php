@@ -41,7 +41,7 @@ class DocumentFactory extends Factory
             'tipo_documento' => fake()->randomElement($tiposDocumento),
             'data_documento' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
             'is_processing' => fake()->boolean(20), // 20% chance of being processed
-            'caminho_arquivo' => fake()->filePath(),
+            'caminho_arquivo' => fake()->uuid(),
             'user_id' => User::factory(),
         ];
     }

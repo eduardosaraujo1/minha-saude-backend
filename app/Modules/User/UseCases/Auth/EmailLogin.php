@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\User\UseCases;
+namespace App\Modules\User\UseCases\Auth;
 
 use App\Http\Exceptions\ApiException;
 use App\Modules\User\DTOs\Auth\LoginResult;

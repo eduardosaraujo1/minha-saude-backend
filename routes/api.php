@@ -34,23 +34,22 @@ Route::prefix('v1')->group(function () {
         Route::put('/profile/name', [ProfileController::class, 'putName']);
         Route::put('/profile/birthdate', [ProfileController::class, 'putBirthdate']);
         Route::put('/profile/phone', [ProfileController::class, 'putPhone']);
-        Route::post('/profile/phone/verify', [ProfileController::class, 'phoneVerify']);
-        Route::post('/profile/phone/send-sms', [ProfileController::class, 'phoneSendSms']);
-        Route::post('/profile/google/link', [ProfileController::class, 'googleLink']);
+        // Route::post('/profile/phone/verify', [ProfileController::class, 'phoneVerify']);
+        // Route::post('/profile/phone/send-sms', [ProfileController::class, 'phoneSendSms']);
+        // Route::post('/profile/google/link', [ProfileController::class, 'googleLink']);
         Route::delete('/profile', [ProfileController::class, 'deleteProfile']);
     });
 
     // Document routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/documents/upload', [DocumentController::class, 'upload']);
+        Route::get('/documents/categories', [DocumentController::class, 'categories']);
         Route::get('/documents', [DocumentController::class, 'index']);
         Route::get('/documents/{id}', [DocumentController::class, 'show']);
         Route::put('/documents/{id}', [DocumentController::class, 'update']);
         Route::delete('/documents/{id}', [DocumentController::class, 'destroy']);
-        Route::post('/documents/{id}/download', [DocumentController::class, 'download']);
-        Route::post('/documents/export', function () {
-            return response()->json(['status' => 'not_implemented']);
-        });
+        Route::get('/documents/{id}/download', [DocumentController::class, 'download']);
+        Route::post('/documents/export', [DocumentController::class, 'export']);
     });
 
     // Trash routes

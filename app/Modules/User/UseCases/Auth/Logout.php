@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\User\UseCases;
+namespace App\Modules\User\UseCases\Auth;
 
 use App\Http\Exceptions\ApiException;
 use App\Utils\Result;
@@ -26,7 +26,7 @@ class Logout
 
             return Result::success(null);
         } catch (\Exception $e) {
-            return Result::failure(new ApiException($e->getMessage()));
+            return Result::failure(ApiException::unexpectedError());
         }
     }
 }

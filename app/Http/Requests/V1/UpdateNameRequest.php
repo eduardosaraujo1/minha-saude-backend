@@ -4,7 +4,7 @@ namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateDocumentRequest extends FormRequest
+class UpdateNameRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,21 @@ class UpdateDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'titulo' => ['nullable', 'string', 'max:255'],
-            'nomePaciente' => ['nullable', 'string', 'max:255'],
-            'nomeMedico' => ['nullable', 'string', 'max:255'],
-            'tipoDocumento' => ['nullable', 'string', 'max:255'],
-            'dataDocumento' => ['nullable', 'date_format:Y-m-d'],
+            'nome' => ['required', 'string', 'max:255'],
+        ];
+    }
+
+    /**
+     * Get custom error messages for validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'nome.required' => 'O nome é obrigatório.',
+            'nome.string' => 'O nome deve ser um texto válido.',
+            'nome.max' => 'O nome não pode ter mais de 255 caracteres.',
         ];
     }
 }

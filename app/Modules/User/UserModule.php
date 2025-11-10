@@ -16,7 +16,7 @@ class UserModule
      */
     public function emailLogin(string $email, string $code): Result
     {
-        return app(UseCases\EmailLogin::class)->execute($email, $code);
+        return app(UseCases\Auth\EmailLogin::class)->execute($email, $code);
     }
 
     /**
@@ -26,7 +26,7 @@ class UserModule
      */
     public function googleLogin(string $oauthToken): Result
     {
-        return app(UseCases\GoogleLogin::class)->execute($oauthToken);
+        return app(UseCases\Auth\GoogleLogin::class)->execute($oauthToken);
     }
 
     /**
@@ -36,7 +36,7 @@ class UserModule
      */
     public function logout(): Result
     {
-        return app(UseCases\Logout::class)->execute();
+        return app(UseCases\Auth\Logout::class)->execute();
     }
 
     /**
@@ -46,7 +46,7 @@ class UserModule
      */
     public function register(RegisterFormData $userData): Result
     {
-        return app(UseCases\Register::class)->execute($userData);
+        return app(UseCases\Auth\Register::class)->execute($userData);
     }
 
     /**
@@ -56,7 +56,7 @@ class UserModule
      */
     public function requestVerificationEmail(string $email): Result
     {
-        return app(UseCases\RequestVerificationEmail::class)->execute($email);
+        return app(UseCases\Auth\RequestVerificationEmail::class)->execute($email);
     }
 
     /**
@@ -66,6 +66,52 @@ class UserModule
      */
     public function reauthenticate(DTOs\Auth\ReauthenticateFormData $data): Result
     {
-        return app(UseCases\Reauthenticate::class)->execute($data);
+        return app(UseCases\Auth\Reauthenticate::class)->execute($data);
+    }
+
+    /**
+     * Get current user information
+     *
+     * @return Result<DTOs\Profile\ProfileDto, \App\Http\Exceptions\ApiException>
+     */
+    public function getUserInfo(): Result
+    {
+        return app(UseCases\Profile\GetUserInfo::class)->execute();
+    }
+
+    /**
+     * Update user's name
+     *
+     * @return Result<null, \App\Http\Exceptions\ApiException>
+     */
+    public function updateName(string $nome): Result
+    {
+        return app(UseCases\Profile\UpdateName::class)->execute($nome);
+    }
+
+    /**
+     * Update user's birthdate
+     *
+     * @return Result<null, \App\Http\Exceptions\ApiException>
+     */
+    public function updateBirthdate(string $dataNascimento): Result
+    {
+        return app(UseCases\Profile\UpdateBirthdate::class)->execute($dataNascimento);
+    }
+
+    /**
+     * Update user's phone
+     *
+     * @return Result<null, \App\Http\Exceptions\ApiException>
+     */
+    public function updatePhone(string $telefone): Result
+    {
+        return app(UseCases\Profile\UpdatePhone::class)->execute($telefone);
+    }
+
+    public function requestDeletion(string $reauthToken): Result
+    {
+
+        return app(UseCases\Profile\RequestDeletion::class)->execute($reauthToken);
     }
 }

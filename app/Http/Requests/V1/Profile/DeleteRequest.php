@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\V1;
+namespace App\Http\Requests\V1\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateDocumentRequest extends FormRequest
+class DeleteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,10 @@ class UpdateDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'titulo' => ['nullable', 'string', 'max:255'],
-            'nomePaciente' => ['nullable', 'string', 'max:255'],
-            'nomeMedico' => ['nullable', 'string', 'max:255'],
-            'tipoDocumento' => ['nullable', 'string', 'max:255'],
-            'dataDocumento' => ['nullable', 'date_format:Y-m-d'],
+            'reauthToken' => [
+                'required',
+                'string',
+            ],
         ];
     }
 }

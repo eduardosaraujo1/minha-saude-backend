@@ -42,7 +42,7 @@ class GoogleServiceAdapter implements GoogleServicePort
                 email: $user->email,
             ));
         } catch (\Exception $e) {
-            return Result::failure(new ApiException($e->getMessage()));
+            return Result::failure(ApiException::unexpectedError());
         }
     }
 }
