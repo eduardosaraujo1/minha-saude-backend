@@ -4,11 +4,14 @@ namespace App\Modules\User\UseCases\Auth;
 
 use App\Http\Exceptions\ApiException;
 use App\Modules\User\Mail\AuthVerificationCode;
+use App\Modules\User\Services\Ports\CacheServicePort;
 use App\Utils\Result;
 use Mail;
 
 class RequestVerificationEmail
 {
+    public function __construct(public CacheServicePort $cacheServicePort) {}
+
     /**
      * Sends the verification code e-mail to the provided path
      *
@@ -20,6 +23,8 @@ class RequestVerificationEmail
             $code = $this->generateCode();
 
             Mail::to($email)->send(new AuthVerificationCode($code));
+
+            $this->cacheServicePort->putEmailAuthCode($email, $code, null);
 
             return Result::success(null);
         } catch (\Exception $th) {
