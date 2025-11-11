@@ -95,7 +95,7 @@ test('can view trashed document details', function () {
     // Assert: Correct data is returned
     $response->assertSuccessful()
         ->assertJson([
-            'idDocumento' => $document->id,
+            'id' => $document->id,
             'titulo' => 'Test Document',
             'nomePaciente' => 'João Silva',
             'nomeMedico' => 'Dr. Maria',

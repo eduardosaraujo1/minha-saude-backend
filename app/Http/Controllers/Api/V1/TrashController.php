@@ -55,7 +55,7 @@ class TrashController extends Controller
             ->firstOrFail();
 
         return response()->json([
-            'idDocumento' => $document->id,
+            'id' => $document->id,
             'titulo' => $document->titulo,
             'nomePaciente' => $document->nome_paciente,
             'nomeMedico' => $document->nome_medico,

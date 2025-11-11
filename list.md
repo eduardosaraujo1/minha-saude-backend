@@ -536,7 +536,7 @@ File Data
 {
     "data": [
         {
-            "idDocumento": "int",
+            "id": "int",
             "titulo": "string"
         }
     ]
@@ -555,7 +555,7 @@ File Data
 
 ```json
 {
-    "idDocumento": "int",
+    "id": "int",
     "titulo": "string",
     "nomePaciente": "string"|null,
     "nomeMedico": "string"|null,
@@ -686,7 +686,7 @@ File Data
 ```json
 [
     {
-        "idDocumento": "int",
+        "id": "int",
         "titulo": "string",
         "nomePaciente": "string"|null,
         "nomeMedico": "string"|null,
