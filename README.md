@@ -352,7 +352,7 @@ O projeto modulariza funcionalidades através da divisão em três camadas, comu
 
 ## Roadmap
 
--   [ ] Implementar funcionalidade de autenticação, começando com google auth test
+-   [ ] Revisar banco de dados e endpoints pra ver se realmente está igual o que o Share Endpoints fala (agora o server deve decidir quando um documento expira e retornar isso pro front)
 
 ## Tutoriais
 
