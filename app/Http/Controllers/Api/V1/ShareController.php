@@ -21,11 +21,13 @@ class ShareController extends Controller
             ->get()
             ->map(function ($share) {
                 return [
-                    'id' => $share->id,
-                    'codigo' => $share->codigo,
-                    'dataPrimeiroUso' => $share->data_primeiro_uso?->format('Y-m-d'),
-                    'expirado' => $share->expirado,
-                    'createdAt' => $share->created_at->format('Y-m-d'),
+                    'data' => [
+                        'id' => $share->id,
+                        'codigo' => $share->codigo,
+                        'dataPrimeiroUso' => $share->data_primeiro_uso?->format('Y-m-d'),
+                        'expirado' => $share->expirado,
+                        'createdAt' => $share->created_at->format('Y-m-d'),
+                    ],
                 ];
             });
 
