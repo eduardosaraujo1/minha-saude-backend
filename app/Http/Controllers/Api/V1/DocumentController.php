@@ -226,14 +226,7 @@ class DocumentController extends Controller
             return response()->json(['message' => $error->message], $error->code);
         }
 
-        Mail::raw('Segue em anexo sua exportação de dados solicitada.', function ($message) use ($user, $exportFilePath) {
-            $message->to($user->email)
-                ->subject('Exportação de Dados - Minha Saúde')
-                ->attach($exportFilePath, [
-                    'as' => 'export.zip',
-                    'mime' => 'application/zip',
-                ]);
-        });
+        Mail::to($user->email)->send(new \App\Modules\Document\Mail\ExportEmail($exportFilePath));
 
         return response()->json([]);
     }
