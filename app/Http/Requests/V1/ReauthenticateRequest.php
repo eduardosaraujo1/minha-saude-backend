@@ -11,7 +11,7 @@ class ReauthenticateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -21,14 +21,23 @@ class ReauthenticateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'authType' => 'required|in:google,email',
+        $rules = [
             'auth' => 'required|array',
-            'auth.google' => 'nullable|array',
-            'auth.google.oauthToken' => 'required_if:authType,google|string',
-            'auth.email' => 'nullable|array',
-            'auth.email.email' => 'required_if:authType,email|email',
-            'auth.email.code' => 'required_if:authType,email|digits:6',
         ];
+
+        // If auth.google is present, validate its structure
+        if ($this->has('auth.google')) {
+            $rules['auth.google'] = 'required|array';
+            $rules['auth.google.oauthToken'] = 'required|string';
+        }
+
+        // If auth.email is present, validate its structure
+        if ($this->has('auth.email')) {
+            $rules['auth.email'] = 'required|array';
+            $rules['auth.email.email'] = 'required|email';
+            $rules['auth.email.code'] = 'required|string';
+        }
+
+        return $rules;
     }
 }

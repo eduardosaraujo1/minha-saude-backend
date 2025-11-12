@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Exceptions\ApiException;
 use App\Http\Requests\V1\StoreDocumentRequest;
 use App\Http\Requests\V1\UpdateDocumentRequest;
+use App\Modules\Document\Mail\ExportEmail;
 use App\Modules\Document\Models\Document;
 use App\Modules\Document\Services\Ports\FileStoragePort;
+use App\Modules\User\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Storage;
 
 class DocumentController extends Controller
 {
@@ -226,15 +229,18 @@ class DocumentController extends Controller
     public function export(Request $request): JsonResponse
     {
         $user = auth()->user();
-        $exportFilePath = base_path('export.zip');
 
-        if (! file_exists($exportFilePath)) {
+        if (! $user instanceof User) {
+            abort(500, 'user_instance_invalid');
+        }
+
+        if (! Storage::disk('local')->exists('export.zip')) {
             $error = ApiException::unexpectedError();
 
             return response()->json(['message' => $error->message], $error->code);
         }
 
-        Mail::to($user->email)->send(new \App\Modules\Document\Mail\ExportEmail($exportFilePath));
+        Mail::to($user->email)->send(new ExportEmail);
 
         return response()->json([]);
     }

@@ -29,12 +29,10 @@ it('reauthenticates user with google credentials', function () {
     $this->actingAs($googleUser);
 
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'google',
         'auth' => [
             'google' => [
                 'oauthToken' => $fakeOauthToken,
             ],
-            'email' => null,
         ],
     ]);
 
@@ -62,9 +60,7 @@ it('reauthenticates user with email credentials', function () {
     $this->actingAs($emailUser);
 
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'email',
         'auth' => [
-            'google' => null,
             'email' => [
                 'email' => $email,
                 'code' => $code,
@@ -97,12 +93,10 @@ it('fails when google oauth token is invalid', function () {
     $this->actingAs($googleUser);
 
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'google',
         'auth' => [
             'google' => [
                 'oauthToken' => 'invalid-token',
             ],
-            'email' => null,
         ],
     ]);
 
@@ -124,9 +118,7 @@ it('fails when email code is incorrect', function () {
     $this->actingAs($emailUser);
 
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'email',
         'auth' => [
-            'google' => null,
             'email' => [
                 'email' => $email,
                 'code' => $wrongCode,
@@ -151,12 +143,10 @@ it('fails when user does not exist', function () {
     $this->actingAs($user);
 
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'google',
         'auth' => [
             'google' => [
                 'oauthToken' => 'some-token',
             ],
-            'email' => null,
         ],
     ]);
 
@@ -171,30 +161,15 @@ it('validates required fields', function () {
     $response = $this->postJson(route('auth.reauthenticate'), []);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['authType', 'auth']);
+        ->assertJsonValidationErrors(['auth']);
 });
 
-it('validates authType must be google or email', function () {
+it('validates google oauth token', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user);
 
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'invalid',
-        'auth' => [],
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['authType']);
-});
-
-it('validates google oauth token is required when authType is google', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user);
-
-    $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'google',
         'auth' => [
             'google' => [],
         ],
@@ -210,7 +185,6 @@ it('validates email and code are required when authType is email', function () {
     $this->actingAs($user);
 
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'email',
         'auth' => [
             'email' => [],
         ],
@@ -222,7 +196,6 @@ it('validates email and code are required when authType is email', function () {
 
 it('requires authentication', function () {
     $response = $this->postJson(route('auth.reauthenticate'), [
-        'authType' => 'email',
         'auth' => [
             'email' => [
                 'email' => 'test@example.com',

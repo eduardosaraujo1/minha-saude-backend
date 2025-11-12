@@ -3,6 +3,7 @@
 namespace App\Modules\Document\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -15,7 +16,7 @@ class ExportEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public string $code)
+    public function __construct()
     {
         //
     }
@@ -47,6 +48,10 @@ class ExportEmail extends Mailable
      */
     public function attachments(): array
     {
-        return [];
+        return [
+            Attachment::fromStorageDisk('local', 'export.zip')
+                ->as('export.zip')
+                ->withMime('application/zip'),
+        ];
     }
 }

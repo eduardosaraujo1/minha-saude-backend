@@ -89,7 +89,7 @@ test('cannot create share with documents from another user', function () {
 
     // Assert: Forbidden
     $response->assertStatus(403)
-        ->assertJson(['message' => 'Some documents do not belong to you']);
+        ->assertJson(['message' => 'forbidden_document_access']);
 });
 
 test('generates unique 8-character share code', function () {
@@ -108,14 +108,20 @@ test('generates unique 8-character share code', function () {
 });
 
 test('can list active share codes', function () {
-    // Arrange: Create shares for user
+    // Arrange: Create shares for user (ensure they are not expired by not setting data_primeiro_uso)
     $doc1 = Document::factory()->create(['user_id' => $this->user->id]);
     $doc2 = Document::factory()->create(['user_id' => $this->user->id]);
 
-    $share1 = Share::factory()->create(['user_id' => $this->user->id]);
+    $share1 = Share::factory()->create([
+        'user_id' => $this->user->id,
+        'data_primeiro_uso' => null,
+    ]);
     $share1->documents()->attach($doc1->id);
 
-    $share2 = Share::factory()->create(['user_id' => $this->user->id]);
+    $share2 = Share::factory()->create([
+        'user_id' => $this->user->id,
+        'data_primeiro_uso' => null,
+    ]);
     $share2->documents()->attach($doc2->id);
 
     // Act: Get shares list
@@ -131,8 +137,7 @@ test('can list active share codes', function () {
     expect($response->json('data.0'))->toHaveKeys([
         'id',
         'codigo',
-        'dataPrimeiroUso',
-        'createdAt',
+        'expiresAt',
     ]);
 });
 
@@ -145,15 +150,21 @@ test('cannot list shares without authentication', function () {
 });
 
 test('list shares only shows own shares', function () {
-    // Arrange: Create shares for two users
+    // Arrange: Create shares for two users (ensure they are not expired)
     $otherUser = User::factory()->create();
 
     $myDoc = Document::factory()->create(['user_id' => $this->user->id]);
-    $myShare = Share::factory()->create(['user_id' => $this->user->id]);
+    $myShare = Share::factory()->create([
+        'user_id' => $this->user->id,
+        'data_primeiro_uso' => null,
+    ]);
     $myShare->documents()->attach($myDoc->id);
 
     $otherDoc = Document::factory()->create(['user_id' => $otherUser->id]);
-    $otherShare = Share::factory()->create(['user_id' => $otherUser->id]);
+    $otherShare = Share::factory()->create([
+        'user_id' => $otherUser->id,
+        'data_primeiro_uso' => null,
+    ]);
     $otherShare->documents()->attach($otherDoc->id);
 
     // Act: Get shares list
@@ -188,14 +199,20 @@ test('can view share details', function () {
 
     // Assert: Correct data is returned
     $response->assertSuccessful()
-        ->assertJson([
-            'codigo' => $share->codigo,
-            'primeiroUsoEm' => null,
+        ->assertJsonFragment(['codigo' => $share->codigo])
+        ->assertJsonStructure([
+            'id',
+            'codigo',
+            'expiresAt',
             'documentos' => [
-                ['id' => $doc1->id, 'titulo' => 'Document 1'],
-                ['id' => $doc2->id, 'titulo' => 'Document 2'],
+                '*' => ['id', 'titulo', 'nomePaciente', 'nomeMedico', 'tipoDocumento', 'dataDocumento'],
             ],
         ]);
+
+    // Assert documents are included
+    expect($response->json('documentos'))->toHaveCount(2);
+    $documentIds = collect($response->json('documentos'))->pluck('id')->toArray();
+    expect($documentIds)->toContain($doc1->id, $doc2->id);
 });
 
 test('cannot view share details without authentication', function () {
@@ -293,7 +310,7 @@ test('share can have data_primeiro_uso set', function () {
     // Act: Get share details
     $response = $this->actingAs($this->user)->getJson("/api/v1/shares/{$share->codigo}");
 
-    // Assert: primeiroUsoEm is returned
+    // Assert: expiresAt is returned
     $response->assertSuccessful();
-    expect($response->json('primeiroUsoEm'))->not->toBeNull();
+    expect($response->json('expiresAt'))->not->toBeNull();
 });

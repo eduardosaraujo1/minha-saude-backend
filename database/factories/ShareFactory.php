@@ -27,7 +27,7 @@ class ShareFactory extends Factory
     public function definition(): array
     {
         return [
-            'codigo' => Str::random(8),
+            'codigo' => Str::upper(Str::random(8)),
             'data_primeiro_uso' => fake()->optional(0.6)->dateTimeBetween('-1 month', 'now'),
             'user_id' => User::factory(),
         ];

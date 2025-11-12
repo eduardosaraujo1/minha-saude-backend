@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\V1\StoreShareRequest;
 use App\Modules\Share\Models\Share;
+use App\Modules\User\Models\User;
 use Illuminate\Http\JsonResponse;
+use Str;
 
 class ShareController extends Controller
 {
@@ -19,14 +21,13 @@ class ShareController extends Controller
         $shares = Share::where('user_id', $user->id)
             ->where('created_at', '>', now()->subDay())
             ->get()
-            ->map(function ($share) {
+            ->map(function (Share $share) {
                 return [
                     'id' => $share->id,
                     'codigo' => $share->codigo,
-                    'dataPrimeiroUso' => $share->data_primeiro_uso?->format('Y-m-d'),
-                    'createdAt' => $share->created_at->format('Y-m-d'),
+                    'expiresAt' => $share->expiresAt(),
                 ];
-            });
+            })->filter(fn ($share) => $share['expiresAt'] > now());
 
         return response()->json([
             'data' => $shares,
@@ -40,6 +41,11 @@ class ShareController extends Controller
     {
         $user = auth()->user();
         $documentIds = $request->input('idsDocumentos');
+        if (! $user instanceof User) {
+            return response()->json([
+                'message' => 'unauthenticated',
+            ], 401);
+        }
 
         // Verify all documents belong to the user
         $userDocuments = $user->documents()
@@ -49,7 +55,7 @@ class ShareController extends Controller
 
         if (count($userDocuments) !== count($documentIds)) {
             return response()->json([
-                'message' => 'Some documents do not belong to you',
+                'message' => 'forbidden_document_access',
             ], 403);
         }
 
@@ -84,12 +90,17 @@ class ShareController extends Controller
             return [
                 'id' => $doc->id,
                 'titulo' => $doc->titulo,
+                'nomePaciente' => $doc->nome_paciente,
+                'nomeMedico' => $doc->nome_medico,
+                'tipoDocumento' => $doc->tipo_documento,
+                'dataDocumento' => $doc->data_documento,
             ];
         });
 
         return response()->json([
+            'id' => $share->id,
             'codigo' => $share->codigo,
-            'primeiroUsoEm' => $share->data_primeiro_uso?->format('Y-m-d'),
+            'expiresAt' => $share->expiresAt(),
             'documentos' => $documentos,
         ]);
     }
@@ -116,11 +127,10 @@ class ShareController extends Controller
     protected function generateShareCode(): string
     {
         do {
-            $timestamp = now()->timestamp;
-            $random = random_int(1000, 9999);
-            $code = strtoupper(substr("SHARE{$timestamp}{$random}", -8));
+            $random = Str::random(8);
+            $code = strtoupper(substr("SHARE{$random}", -8));
         } while (Share::where('codigo', $code)->exists());
 
-        return $code;
+        return Str::upper($code);
     }
 }

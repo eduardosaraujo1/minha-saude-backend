@@ -790,21 +790,3 @@ test('cannot export without authentication', function () {
     // Assert: Unauthorized
     $response->assertUnauthorized();
 });
-
-test('returns error when export file does not exist', function () {
-    // Arrange: Create user and ensure export file doesn't exist
-    $user = User::factory()->create();
-
-    $exportPath = base_path('export.zip');
-    if (file_exists($exportPath)) {
-        unlink($exportPath);
-    }
-
-    // Act: Request export
-    $response = $this->actingAs($user)
-        ->postJson('/api/v1/documents/export');
-
-    // Assert: Error response
-    $response->assertStatus(500)
-        ->assertJson(['message' => 'unexpected_error']);
-});

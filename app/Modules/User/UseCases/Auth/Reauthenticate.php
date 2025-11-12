@@ -32,9 +32,9 @@ class Reauthenticate
             $user = null;
 
             // Verify credentials based on auth type
-            if ($data->authType === 'google' && $data->googleAuth !== null) {
+            if ($data->googleAuth !== null) {
                 $user = $this->verifyGoogleAuth($data->googleAuth->oauthToken);
-            } elseif ($data->authType === 'email' && $data->emailAuth !== null) {
+            } elseif ($data->emailAuth !== null) {
                 $user = $this->verifyEmailAuth($data->emailAuth->email, $data->emailAuth->code);
             }
 
