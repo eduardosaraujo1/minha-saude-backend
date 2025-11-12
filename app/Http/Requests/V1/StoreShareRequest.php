@@ -23,7 +23,7 @@ class StoreShareRequest extends FormRequest
     {
         return [
             'idsDocumentos' => ['required', 'array', 'min:1'],
-            'idsDocumentos.*' => ['required', 'integer', 'exists:documents,id'],
+            'idsDocumentos.*' => ['required', 'uuid', 'exists:documents,id'],
         ];
     }
 }

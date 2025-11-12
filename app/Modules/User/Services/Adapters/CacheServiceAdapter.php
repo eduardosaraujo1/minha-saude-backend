@@ -52,7 +52,6 @@ class CacheServiceAdapter implements CacheServicePort
     {
         try {
             Cache::put("email-auth-$email", $code, $ttl ?? now()->addMinutes(15));
-            var_dump("[DEBUG] Stored code $code for email $email");
         } catch (\Throwable $th) {
             Log::error('Error during cache storage: '.$th->getMessage(), [$th]);
 
@@ -63,9 +62,7 @@ class CacheServiceAdapter implements CacheServicePort
     public function getEmailAuthCode(string $email): ?string
     {
         try {
-            var_dump("[DEBUG] Retrieving code for email $email");
             $entry = Cache::get("email-auth-$email");
-            var_dump('[DEBUG] Retrieved entry: '.var_export($entry, true));
 
             if (! is_string($entry)) {
                 Log::warning('Unexpected type found when querying for email auth code. Presuming it was never set.');

@@ -43,12 +43,6 @@ class ShareSeeder extends Seeder
             }
         });
 
-        // Create some expired and used shares
-        Share::factory()
-            ->count(3)
-            ->expired()
-            ->create();
-
         Share::factory()
             ->count(5)
             ->used()

@@ -22,7 +22,6 @@ class Share extends Model
     protected $fillable = [
         'codigo',
         'data_primeiro_uso',
-        'expirado',
         'user_id',
     ];
 
@@ -56,7 +55,6 @@ class Share extends Model
     {
         return [
             'data_primeiro_uso' => 'datetime',
-            'expirado' => 'boolean',
         ];
     }
 }

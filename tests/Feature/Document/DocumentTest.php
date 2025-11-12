@@ -148,9 +148,10 @@ test('returns error when file storage fails on upload', function () {
     $response->assertStatus(500)
         ->assertJson(['message' => 'unexpected_error']);
 
-    // Assert: No document created
+    // Assert: Document is rolled back (deleted after storage failure)
     $this->assertDatabaseMissing('documents', [
         'user_id' => $user->id,
+        'deleted_at' => null,
     ]);
 });
 
@@ -381,7 +382,7 @@ test('can view document details', function () {
 
     // Act: Get document details
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/documents/'.$document->caminho_arquivo);
+        ->getJson('/api/v1/documents/'.$document->id);
 
     // Assert: Correct data returned
     $response->assertSuccessful()
@@ -392,7 +393,6 @@ test('can view document details', function () {
             'nomeMedico' => 'Dr. Maria',
             'tipoDocumento' => 'Exame',
             'dataDocumento' => '2025-01-15',
-            'caminhoArquivo' => $document->caminho_arquivo,
         ]);
 
     // Assert: deletedAt is null for active document
@@ -405,7 +405,7 @@ test('cannot view document without authentication', function () {
     $document = Document::factory()->create(['user_id' => $user->id]);
 
     // Act: Try to view without authentication
-    $response = $this->getJson('/api/v1/documents/'.$document->caminho_arquivo);
+    $response = $this->getJson('/api/v1/documents/'.$document->id);
 
     // Assert: Unauthorized
     $response->assertUnauthorized();
@@ -419,7 +419,7 @@ test('cannot view another user document', function () {
 
     // Act: Try to view other user's document
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/documents/'.$document->caminho_arquivo);
+        ->getJson('/api/v1/documents/'.$document->id);
 
     // Assert: Not found
     $response->assertNotFound();
@@ -433,7 +433,7 @@ test('cannot view soft deleted document', function () {
 
     // Act: Try to view deleted document
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/documents/'.$document->caminho_arquivo);
+        ->getJson('/api/v1/documents/'.$document->id);
 
     // Assert: Not found (soft deleted documents are excluded by default query)
     $response->assertNotFound();
@@ -465,7 +465,7 @@ test('can update document with all fields', function () {
 
     // Act: Update document
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/documents/'.$document->caminho_arquivo, [
+        ->putJson('/api/v1/documents/'.$document->id, [
             'titulo' => 'New Title',
             'nomePaciente' => 'New Patient',
             'nomeMedico' => 'New Doctor',
@@ -500,7 +500,7 @@ test('can update document with partial fields', function () {
 
     // Act: Update only title
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/documents/'.$document->caminho_arquivo, [
+        ->putJson('/api/v1/documents/'.$document->id, [
             'titulo' => 'Updated Title',
         ]);
 
@@ -520,7 +520,7 @@ test('cannot update document without authentication', function () {
     $document = Document::factory()->create(['user_id' => $user->id]);
 
     // Act: Try to update without authentication
-    $response = $this->putJson('/api/v1/documents/'.$document->caminho_arquivo, [
+    $response = $this->putJson('/api/v1/documents/'.$document->id, [
         'titulo' => 'New Title',
     ]);
 
@@ -536,7 +536,7 @@ test('cannot update another user document', function () {
 
     // Act: Try to update other user's document
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/documents/'.$document->caminho_arquivo, [
+        ->putJson('/api/v1/documents/'.$document->id, [
             'titulo' => 'New Title',
         ]);
 
@@ -552,7 +552,7 @@ test('cannot update soft deleted document', function () {
 
     // Act: Try to update deleted document
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/documents/'.$document->caminho_arquivo, [
+        ->putJson('/api/v1/documents/'.$document->id, [
             'titulo' => 'New Title',
         ]);
 
@@ -567,7 +567,7 @@ test('validates date format on update', function () {
 
     // Act: Try to update with invalid date
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/documents/'.$document->caminho_arquivo, [
+        ->putJson('/api/v1/documents/'.$document->id, [
             'dataDocumento' => '15/01/2025', // Wrong format
         ]);
 
@@ -583,7 +583,7 @@ test('validates string max length on update', function () {
 
     // Act: Try to update with too long string
     $response = $this->actingAs($user)
-        ->putJson('/api/v1/documents/'.$document->caminho_arquivo, [
+        ->putJson('/api/v1/documents/'.$document->id, [
             'titulo' => str_repeat('a', 256), // Over 255 chars
         ]);
 
@@ -605,7 +605,7 @@ test('can soft delete document', function () {
 
     // Act: Delete document
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/documents/'.$document->caminho_arquivo);
+        ->deleteJson('/api/v1/documents/'.$document->id);
 
     // Assert: Successful response
     $response->assertSuccessful()
@@ -621,7 +621,7 @@ test('cannot delete document without authentication', function () {
     $document = Document::factory()->create(['user_id' => $user->id]);
 
     // Act: Try to delete without authentication
-    $response = $this->deleteJson('/api/v1/documents/'.$document->caminho_arquivo);
+    $response = $this->deleteJson('/api/v1/documents/'.$document->id);
 
     // Assert: Unauthorized
     $response->assertUnauthorized();
@@ -635,7 +635,7 @@ test('cannot delete another user document', function () {
 
     // Act: Try to delete other user's document
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/documents/'.$document->caminho_arquivo);
+        ->deleteJson('/api/v1/documents/'.$document->id);
 
     // Assert: Not found
     $response->assertNotFound();
@@ -661,7 +661,7 @@ test('cannot delete already soft deleted document', function () {
 
     // Act: Try to delete again
     $response = $this->actingAs($user)
-        ->deleteJson('/api/v1/documents/'.$document->caminho_arquivo);
+        ->deleteJson('/api/v1/documents/'.$document->id);
 
     // Assert: Not found (soft deleted documents are excluded by default query)
     $response->assertNotFound();
@@ -685,7 +685,7 @@ test('can download document', function () {
 
     // Act: Download document
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/documents/'.$document->caminho_arquivo.'/download');
+        ->getJson('/api/v1/documents/'.$document->id.'/download');
 
     // Assert: Successful with PDF headers
     $response->assertSuccessful();
@@ -701,7 +701,7 @@ test('cannot download document without authentication', function () {
     $document = Document::factory()->create(['user_id' => $user->id]);
 
     // Act: Try to download without authentication
-    $response = $this->getJson('/api/v1/documents/'.$document->caminho_arquivo.'/download');
+    $response = $this->getJson('/api/v1/documents/'.$document->id.'/download');
 
     // Assert: Unauthorized
     $response->assertUnauthorized();
@@ -715,7 +715,7 @@ test('cannot download another user document', function () {
 
     // Act: Try to download other user's document
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/documents/'.$document->caminho_arquivo.'/download');
+        ->getJson('/api/v1/documents/'.$document->id.'/download');
 
     // Assert: Not found
     $response->assertNotFound();
@@ -734,7 +734,7 @@ test('returns error when file retrieval fails on download', function () {
 
     // Act: Try to download
     $response = $this->actingAs($user)
-        ->getJson('/api/v1/documents/'.$document->caminho_arquivo.'/download');
+        ->getJson('/api/v1/documents/'.$document->id.'/download');
 
     // Assert: Error response
     $response->assertStatus(500)

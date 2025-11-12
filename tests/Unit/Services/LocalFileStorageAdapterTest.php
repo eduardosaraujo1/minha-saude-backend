@@ -17,7 +17,7 @@ it('stores file content successfully', function () {
     $result = $adapter->store($userId, $uuid, $content);
 
     expect($result)->toBeTrue();
-    expect(Storage::disk('local')->exists("{$userId}/{$uuid}"))->toBeTrue();
+    expect(Storage::disk('local')->exists("{$userId}/{$uuid}.pdf"))->toBeTrue();
 });
 
 it('stores uploaded file successfully', function () {
@@ -29,7 +29,7 @@ it('stores uploaded file successfully', function () {
     $result = $adapter->store($userId, $uuid, $file);
 
     expect($result)->toBeTrue();
-    expect(Storage::disk('local')->exists("{$userId}/{$uuid}"))->toBeTrue();
+    expect(Storage::disk('local')->exists("{$userId}/{$uuid}.pdf"))->toBeTrue();
 });
 
 it('retrieves file content successfully', function () {
@@ -64,7 +64,7 @@ it('deletes file successfully', function () {
     $result = $adapter->delete($userId, $uuid);
 
     expect($result)->toBeTrue();
-    expect(Storage::disk('local')->exists("{$userId}/{$uuid}"))->toBeFalse();
+    expect(Storage::disk('local')->exists("{$userId}/{$uuid}.pdf"))->toBeFalse();
 });
 
 it('returns true when deleting non-existent file', function () {

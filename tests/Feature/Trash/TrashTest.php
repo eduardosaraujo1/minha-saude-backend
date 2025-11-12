@@ -90,7 +90,7 @@ test('can view trashed document details', function () {
 
     // Act: Get document details
     $response = $this->actingAs($this->user)
-        ->getJson('/api/v1/trash/'.$document->caminho_arquivo);
+        ->getJson('/api/v1/trash/'.$document->id);
 
     // Assert: Correct data is returned
     $response->assertSuccessful()
@@ -101,7 +101,6 @@ test('can view trashed document details', function () {
             'nomeMedico' => 'Dr. Maria',
             'tipoDocumento' => 'Exame',
             'dataDocumento' => '2025-01-15',
-            'caminhoArquivo' => $document->caminho_arquivo,
         ]);
 
     // Assert: deletedAt is present
@@ -114,7 +113,7 @@ test('cannot view trashed document without authentication', function () {
     $document->delete();
 
     // Act: Try to view without authentication
-    $response = $this->getJson('/api/v1/trash/'.$document->caminho_arquivo);
+    $response = $this->getJson('/api/v1/trash/'.$document->id);
 
     // Assert: Unauthorized
     $response->assertUnauthorized();
@@ -128,7 +127,7 @@ test('cannot view another user trashed document', function () {
 
     // Act: Try to view other user's document
     $response = $this->actingAs($this->user)
-        ->getJson('/api/v1/trash/'.$document->caminho_arquivo);
+        ->getJson('/api/v1/trash/'.$document->id);
 
     // Assert: Not found
     $response->assertNotFound();
@@ -140,7 +139,7 @@ test('cannot view non-trashed document in trash', function () {
 
     // Act: Try to view as trash
     $response = $this->actingAs($this->user)
-        ->getJson('/api/v1/trash/'.$document->caminho_arquivo);
+        ->getJson('/api/v1/trash/'.$document->id);
 
     // Assert: Not found
     $response->assertNotFound();
@@ -159,7 +158,7 @@ test('can restore trashed document', function () {
 
     // Act: Restore the document
     $response = $this->actingAs($this->user)
-        ->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/restore');
+        ->postJson('/api/v1/trash/'.$document->id.'/restore');
 
     // Assert: Successful response
     $response->assertSuccessful()
@@ -175,7 +174,7 @@ test('cannot restore trashed document without authentication', function () {
     $document->delete();
 
     // Act: Try to restore without authentication
-    $response = $this->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/restore');
+    $response = $this->postJson('/api/v1/trash/'.$document->id.'/restore');
 
     // Assert: Unauthorized
     $response->assertUnauthorized();
@@ -189,7 +188,7 @@ test('cannot restore another user trashed document', function () {
 
     // Act: Try to restore other user's document
     $response = $this->actingAs($this->user)
-        ->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/restore');
+        ->postJson('/api/v1/trash/'.$document->id.'/restore');
 
     // Assert: Not found
     $response->assertNotFound();
@@ -201,7 +200,7 @@ test('cannot restore non-trashed document', function () {
 
     // Act: Try to restore active document
     $response = $this->actingAs($this->user)
-        ->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/restore');
+        ->postJson('/api/v1/trash/'.$document->id.'/restore');
 
     // Assert: Not found
     $response->assertNotFound();
@@ -226,7 +225,7 @@ test('can permanently delete trashed document', function () {
 
     // Act: Permanently delete the document
     $response = $this->actingAs($this->user)
-        ->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/destroy');
+        ->postJson('/api/v1/trash/'.$document->id.'/destroy');
 
     // Assert: Successful response
     $response->assertSuccessful()
@@ -242,7 +241,7 @@ test('cannot permanently delete trashed document without authentication', functi
     $document->delete();
 
     // Act: Try to delete without authentication
-    $response = $this->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/destroy');
+    $response = $this->postJson('/api/v1/trash/'.$document->id.'/destroy');
 
     // Assert: Unauthorized
     $response->assertUnauthorized();
@@ -256,7 +255,7 @@ test('cannot permanently delete another user trashed document', function () {
 
     // Act: Try to delete other user's document
     $response = $this->actingAs($this->user)
-        ->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/destroy');
+        ->postJson('/api/v1/trash/'.$document->id.'/destroy');
 
     // Assert: Not found
     $response->assertNotFound();
@@ -268,7 +267,7 @@ test('cannot permanently delete non-trashed document', function () {
 
     // Act: Try to permanently delete active document
     $response = $this->actingAs($this->user)
-        ->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/destroy');
+        ->postJson('/api/v1/trash/'.$document->id.'/destroy');
 
     // Assert: Not found
     $response->assertNotFound();
@@ -287,7 +286,7 @@ test('returns error when file deletion fails', function () {
 
     // Act: Try to permanently delete
     $response = $this->actingAs($this->user)
-        ->postJson('/api/v1/trash/'.$document->caminho_arquivo.'/destroy');
+        ->postJson('/api/v1/trash/'.$document->id.'/destroy');
 
     // Assert: Error response
     $response->assertStatus(500)

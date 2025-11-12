@@ -49,13 +49,13 @@ test('user has shares relationship', function () {
 test('document model can be created with all fields', function () {
     $user = User::factory()->create();
     $documentData = [
+        'id' => fake()->uuid(),
         'titulo' => 'Test Document',
         'nome_paciente' => 'Patient Name',
         'nome_medico' => 'Dr. Medical',
         'tipo_documento' => 'Receita',
-        'data_documento' => now()->subDays(30)->toDate(), // Use Carbon date
-        'is_processing' => true, // Boolean instead of string
-        'caminho_arquivo' => '/path/to/file.pdf',
+        'data_documento' => now()->subDays(30)->toDate(),
+        'is_processing' => true,
         'user_id' => $user->id,
     ];
 
@@ -102,7 +102,6 @@ test('share model can be created with all fields', function () {
 
     expect($share)->toBeInstanceOf(Share::class);
     expect($share->codigo)->toEqual($shareData['codigo']);
-    expect($share->expirado)->toBeFalse();
     expect($share->user_id)->toEqual($user->id);
 
     // Test that datetime casting works properly
@@ -161,14 +160,13 @@ test('models use correct casts', function () {
     // Test Document casts with proper data types
     $documentDate = now()->subDays(15)->toDate();
     $document = Document::factory()->create([
-        'is_processing' => true, // Boolean instead of string
+        'is_processing' => true,
         'data_documento' => $documentDate,
     ]);
 
     // Test Share casts with proper data types
     $firstUseDate = now()->subDays(3);
     $share = Share::factory()->create([
-        'expirado' => false, // Boolean instead of string
         'data_primeiro_uso' => $firstUseDate,
     ]);
 
@@ -183,8 +181,6 @@ test('models use correct casts', function () {
     expect($document->data_documento)->toBeInstanceOf(\Carbon\Carbon::class);
 
     // Test Share casts
-    expect($share->expirado)->toBeBool();
-    expect($share->expirado)->toBeFalse();
     expect($share->data_primeiro_uso)->toBeInstanceOf(\Carbon\Carbon::class);
 });
 
@@ -210,19 +206,14 @@ test('cast conversion from database strings', function () {
 
 test('boolean cast from database', function () {
     $document = Document::factory()->create();
-    $share = Share::factory()->create();
 
     // Update database with string/numeric boolean representations
     DB::table('documents')->where('id', $document->id)->update(['is_processing' => '1']);
-    DB::table('shares')->where('id', $share->id)->update(['expirado' => '0']);
 
     // Refresh models
     $document->refresh();
-    $share->refresh();
 
     // Test proper boolean casting
     expect($document->is_processing)->toBeBool();
     expect($document->is_processing)->toBeTrue();
-    expect($share->expirado)->toBeBool();
-    expect($share->expirado)->toBeFalse();
 });

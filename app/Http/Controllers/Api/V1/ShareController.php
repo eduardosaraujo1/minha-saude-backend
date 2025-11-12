@@ -17,17 +17,14 @@ class ShareController extends Controller
         $user = auth()->user();
 
         $shares = Share::where('user_id', $user->id)
-            ->where('expirado', false)
+            ->where('created_at', '>', now()->subDay())
             ->get()
             ->map(function ($share) {
                 return [
-                    'data' => [
-                        'id' => $share->id,
-                        'codigo' => $share->codigo,
-                        'dataPrimeiroUso' => $share->data_primeiro_uso?->format('Y-m-d'),
-                        'expirado' => $share->expirado,
-                        'createdAt' => $share->created_at->format('Y-m-d'),
-                    ],
+                    'id' => $share->id,
+                    'codigo' => $share->codigo,
+                    'dataPrimeiroUso' => $share->data_primeiro_uso?->format('Y-m-d'),
+                    'createdAt' => $share->created_at->format('Y-m-d'),
                 ];
             });
 

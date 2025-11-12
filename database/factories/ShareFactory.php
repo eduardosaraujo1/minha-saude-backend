@@ -29,7 +29,6 @@ class ShareFactory extends Factory
         return [
             'codigo' => Str::random(8),
             'data_primeiro_uso' => fake()->optional(0.6)->dateTimeBetween('-1 month', 'now'),
-            'expirado' => fake()->boolean(30), // 30% chance of being expired
             'user_id' => User::factory(),
         ];
     }
@@ -41,16 +40,6 @@ class ShareFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'data_primeiro_uso' => fake()->dateTimeBetween('-1 month', 'now'),
-        ]);
-    }
-
-    /**
-     * Indicate that the share is expired.
-     */
-    public function expired(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'expirado' => true,
         ]);
     }
 

@@ -27,33 +27,42 @@ class DocumentController extends Controller
         $user = auth()->user();
         $file = $request->file('arquivos');
 
-        $uuid = (string) Str::uuid();
+        $documentId = (string) Str::uuid();
 
-        // Store the file using the FileStoragePort
-        $stored = $this->fileStorage->store(
-            (string) $user->id,
-            $uuid,
-            $file
-        );
-
-        if (! $stored) {
-            $error = ApiException::unexpectedError();
-
-            return response()->json(['message' => $error->message], $error->code);
-        }
-
-        // Create document record
-        Document::create([
+        // Create document record first to get the UUID
+        $document = Document::create([
+            'id' => $documentId,
             'titulo' => $request->input('titulo', 'Documento sem título'),
             'nome_paciente' => $request->input('nomePaciente'),
             'nome_medico' => $request->input('nomeMedico'),
             'tipo_documento' => $request->input('tipoDocumento'),
             'data_documento' => $request->input('dataDocumento'),
-            'caminho_arquivo' => $uuid,
             'user_id' => $user->id,
         ]);
 
-        return response()->json([]);
+        // Store the file using the FileStoragePort with document UUID
+        $stored = $this->fileStorage->store(
+            (string) $user->id,
+            $document->id,
+            $file
+        );
+
+        if (! $stored) {
+            $document->delete();
+            $error = ApiException::unexpectedError();
+
+            return response()->json(['message' => $error->message], $error->code);
+        }
+
+        return response()->json([
+            'id' => $document->id,
+            'titulo' => $document->titulo,
+            'nomePaciente' => $document->nome_paciente,
+            'nomeMedico' => $document->nome_medico,
+            'tipoDocumento' => $document->tipo_documento,
+            'dataDocumento' => $document->data_documento?->format('Y-m-d'),
+            'createdAt' => $document->created_at->format('Y-m-d'),
+        ]);
     }
 
     /**
@@ -63,15 +72,15 @@ class DocumentController extends Controller
     {
         $user = auth()->user();
 
-        // Find document by caminho_arquivo (uuid)
-        $document = Document::where('caminho_arquivo', $id)
+        // Find document by id (uuid)
+        $document = Document::where('id', $id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 
         // Retrieve file content
         $fileContent = $this->fileStorage->retrieve(
             (string) $user->id,
-            $document->caminho_arquivo
+            $document->id
         );
 
         if (! $fileContent) {
@@ -145,7 +154,7 @@ class DocumentController extends Controller
     {
         $user = auth()->user();
 
-        $document = Document::where('caminho_arquivo', $id)
+        $document = Document::where('id', $id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 
@@ -164,7 +173,6 @@ class DocumentController extends Controller
             'dataDocumento' => $document->data_documento?->format('Y-m-d'),
             'createdAt' => $document->created_at->format('Y-m-d'),
             'deletedAt' => $document->deleted_at?->format('Y-m-d'),
-            'caminhoArquivo' => $document->caminho_arquivo,
         ]);
     }
 
@@ -175,7 +183,7 @@ class DocumentController extends Controller
     {
         $user = auth()->user();
 
-        $document = Document::where('caminho_arquivo', $id)
+        $document = Document::where('id', $id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 
@@ -203,7 +211,7 @@ class DocumentController extends Controller
     {
         $user = auth()->user();
 
-        $document = Document::where('caminho_arquivo', $id)
+        $document = Document::where('id', $id)
             ->where('user_id', $user->id)
             ->firstOrFail();
 

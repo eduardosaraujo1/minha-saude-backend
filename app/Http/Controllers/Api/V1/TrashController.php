@@ -49,7 +49,7 @@ class TrashController extends Controller
     {
         $user = auth()->user();
 
-        $document = Document::where('caminho_arquivo', $id)
+        $document = Document::where('id', $id)
             ->where('user_id', $user->id)
             ->onlyTrashed()
             ->firstOrFail();
@@ -63,7 +63,6 @@ class TrashController extends Controller
             'dataDocumento' => $document->data_documento?->format('Y-m-d'),
             'createdAt' => $document->created_at->format('Y-m-d'),
             'deletedAt' => $document->deleted_at->format('Y-m-d'),
-            'caminhoArquivo' => $document->caminho_arquivo,
         ]);
     }
 
@@ -74,7 +73,7 @@ class TrashController extends Controller
     {
         $user = auth()->user();
 
-        $document = Document::where('caminho_arquivo', $id)
+        $document = Document::where('id', $id)
             ->where('user_id', $user->id)
             ->onlyTrashed()
             ->firstOrFail();
@@ -91,7 +90,7 @@ class TrashController extends Controller
     {
         $user = auth()->user();
 
-        $document = Document::where('caminho_arquivo', $id)
+        $document = Document::where('id', $id)
             ->where('user_id', $user->id)
             ->onlyTrashed()
             ->firstOrFail();
@@ -99,7 +98,7 @@ class TrashController extends Controller
         // Delete the physical file
         $deleted = $this->fileStorage->delete(
             (string) $user->id,
-            $document->caminho_arquivo
+            $document->id
         );
 
         if (! $deleted) {

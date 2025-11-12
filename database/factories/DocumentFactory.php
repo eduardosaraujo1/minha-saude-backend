@@ -35,13 +35,13 @@ class DocumentFactory extends Factory
         ];
 
         return [
+            'id' => fake()->uuid(),
             'titulo' => fake()->randomElement($titulos),
             'nome_paciente' => fake()->name(),
             'nome_medico' => 'Dr. '.fake()->name(),
             'tipo_documento' => fake()->randomElement($tiposDocumento),
             'data_documento' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
             'is_processing' => fake()->boolean(20), // 20% chance of being processed
-            'caminho_arquivo' => fake()->uuid(),
             'user_id' => User::factory(),
         ];
     }

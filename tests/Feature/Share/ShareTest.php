@@ -25,7 +25,6 @@ test('can create share with valid documents', function () {
     // Assert: Share was created in database
     $this->assertDatabaseHas('shares', [
         'user_id' => $this->user->id,
-        'expirado' => false,
     ]);
 
     // Assert: Documents are attached to share
@@ -113,14 +112,11 @@ test('can list active share codes', function () {
     $doc1 = Document::factory()->create(['user_id' => $this->user->id]);
     $doc2 = Document::factory()->create(['user_id' => $this->user->id]);
 
-    $share1 = Share::factory()->create(['user_id' => $this->user->id, 'expirado' => false]);
+    $share1 = Share::factory()->create(['user_id' => $this->user->id]);
     $share1->documents()->attach($doc1->id);
 
-    $share2 = Share::factory()->create(['user_id' => $this->user->id, 'expirado' => false]);
+    $share2 = Share::factory()->create(['user_id' => $this->user->id]);
     $share2->documents()->attach($doc2->id);
-
-    // Create expired share (should not be in list)
-    $expiredShare = Share::factory()->create(['user_id' => $this->user->id, 'expirado' => true]);
 
     // Act: Get shares list
     $response = $this->actingAs($this->user)->getJson('/api/v1/shares');
@@ -129,15 +125,13 @@ test('can list active share codes', function () {
     $response->assertSuccessful()
         ->assertJsonCount(2, 'data')
         ->assertJsonFragment(['codigo' => $share1->codigo])
-        ->assertJsonFragment(['codigo' => $share2->codigo])
-        ->assertJsonMissing(['codigo' => $expiredShare->codigo]);
+        ->assertJsonFragment(['codigo' => $share2->codigo]);
 
     // Assert: Response structure
     expect($response->json('data.0'))->toHaveKeys([
         'id',
         'codigo',
         'dataPrimeiroUso',
-        'expirado',
         'createdAt',
     ]);
 });

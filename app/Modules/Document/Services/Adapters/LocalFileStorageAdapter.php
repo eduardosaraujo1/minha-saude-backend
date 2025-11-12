@@ -11,16 +11,16 @@ class LocalFileStorageAdapter implements FileStoragePort
      * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $content
      * @return bool|string
      */
-    public function store(string $userId, string $uuid, mixed $content): bool
+    public function store(string $userId, string $documentId, mixed $content): bool
     {
-        $path = $this->buildPath($userId, $uuid);
+        $path = $this->buildPath($userId, $documentId);
 
         return Storage::disk('local')->put($path, $content);
     }
 
-    public function retrieve(string $userId, string $uuid): ?string
+    public function retrieve(string $userId, string $documentId): ?string
     {
-        $path = $this->buildPath($userId, $uuid);
+        $path = $this->buildPath($userId, $documentId);
 
         if (! Storage::disk('local')->exists($path)) {
             return null;
@@ -29,15 +29,15 @@ class LocalFileStorageAdapter implements FileStoragePort
         return Storage::disk('local')->get($path);
     }
 
-    public function delete(string $userId, string $uuid): bool
+    public function delete(string $userId, string $documentId): bool
     {
-        $path = $this->buildPath($userId, $uuid);
+        $path = $this->buildPath($userId, $documentId);
 
         return Storage::disk('local')->delete($path);
     }
 
-    private function buildPath(string $userId, string $uuid): string
+    private function buildPath(string $userId, string $documentId): string
     {
-        return "{$userId}/{$uuid}";
+        return "{$userId}/{$documentId}.pdf";
     }
 }
