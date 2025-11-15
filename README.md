@@ -302,6 +302,12 @@ chmod -R 755 storage bootstrap/cache
 
 ---
 
+## Extra: falsificação do export.zip
+
+Após a instalação, coloque um arquivo chamado `export.zip` na pasta `storage/app/private` para que a funcionalidade de exportação funcione corretamente durante o desenvolvimento.
+
+---
+
 ## Pipeline CI/CD
 
 -   [Clique aqui](https://sonarqube.etec.dev.br) para ver o resultado da execução do SonarQube

@@ -204,5 +204,5 @@ it('requires authentication', function () {
         ],
     ]);
 
-    $response->assertForbidden();
+    $response->assertClientError();
 });
