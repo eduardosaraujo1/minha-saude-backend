@@ -7,7 +7,6 @@
         "esbenp.prettier-vscode",
         "qwtel.sqlite-viewer",
         "bradlc.vscode-tailwindcss",
-        "shardulm94.trailing-spaces",
         "editorconfig.editorconfig"
     ]
 }
