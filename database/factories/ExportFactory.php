@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Data\Models\Export;
-use App\Data\Models\User;
+use App\Modules\Document\Models\Export;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Data\Models\Export>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\Document\Models\Export>
  */
 class ExportFactory extends Factory
 {

@@ -1,6 +1,6 @@
 <?php
 
-use App\Data\Models\UserAuthMethod;
+use App\Modules\User\DTOs\Auth\UserAuthMethod;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

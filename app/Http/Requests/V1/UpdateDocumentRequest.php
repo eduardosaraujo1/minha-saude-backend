@@ -11,7 +11,7 @@ class UpdateDocumentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,11 @@ class UpdateDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'titulo' => ['nullable', 'string', 'max:255'],
+            'nomePaciente' => ['nullable', 'string', 'max:255'],
+            'nomeMedico' => ['nullable', 'string', 'max:255'],
+            'tipoDocumento' => ['nullable', 'string', 'max:255'],
+            'dataDocumento' => ['nullable', 'date_format:Y-m-d'],
         ];
     }
 }

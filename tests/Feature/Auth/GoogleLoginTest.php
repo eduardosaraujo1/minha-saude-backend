@@ -1,11 +1,11 @@
 <?php
 
-use App\Data\Models\User;
-use App\Data\Models\UserAuthMethod;
-use App\Data\Services\Cache\CacheService;
-use App\Data\Services\Google\DTO\UserInfo;
-use App\Data\Services\Google\GoogleService;
-use App\Domain\Exceptions\ExceptionDictionary;
+use App\Http\Exceptions\ApiException;
+use App\Modules\User\DTOs\Auth\UserAuthMethod;
+use App\Modules\User\DTOs\Google\UserInfo;
+use App\Modules\User\Models\User;
+use App\Modules\User\Services\Ports\CacheServicePort;
+use App\Modules\User\Services\Ports\GoogleServicePort;
 use App\Utils\Result;
 
 test('google login authenticates user', function () {
@@ -21,7 +21,7 @@ test('google login authenticates user', function () {
 
     // Arrange: Mock GoogleService to return user info for existing user
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($user, $fakeGoogleId, $fakeServerAuth) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
@@ -66,7 +66,7 @@ test('requests registration on unregistered user', function () {
     $fakeEmail = 'newuser@example.com';
 
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($fakeServerAuth, $fakeGoogleId, $fakeEmail) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
@@ -102,7 +102,7 @@ test('requests registration on unregistered user', function () {
     expect($registerToken)->toBeString();
 
     // Assert: Register token is stored in cache with correct data
-    $cachedEntry = app(CacheService::class)->getRegisterTokenData($registerToken);
+    $cachedEntry = app(CacheServicePort::class)->getRegisterTokenData($registerToken);
     expect($cachedEntry)->not->toBeNull();
     expect($cachedEntry->email)->toEqual($fakeEmail);
     expect($cachedEntry->googleId)->toEqual($fakeGoogleId);
@@ -119,7 +119,7 @@ test('returns client error on unreachable google service', function () {
     $fakeServerAuth = 'invalid-oauth-token';
 
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($fakeServerAuth) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
@@ -142,13 +142,13 @@ test('returns client error on invalid oauth token', function () {
     $fakeServerAuth = 'invalid-oauth-token';
 
     $this->mock(
-        GoogleService::class,
+        GoogleServicePort::class,
         function (\Mockery\MockInterface $mock) use ($fakeServerAuth) {
             $mock->shouldReceive('getUserInfo')
                 ->once()
                 ->with($fakeServerAuth)
                 ->andReturn(Result::failure(
-                    new \Exception(ExceptionDictionary::INVALID_OAUTH_TOKEN)
+                    ApiException::invalidOauthToken()
                 ));
         });
 
@@ -168,4 +168,52 @@ test('validation fails on missing token', function () {
     // Assert: Validation error
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['tokenOauth']);
+});
+
+test('integration with real google api - existing user', function () {
+    $this->markTestSkipped(
+        'This test requires a fresh OAuth code from the mobile app. '.
+        'Get one using the Flutter app debugger, then replace the $code variable below. '.
+        'Remove this markTestSkipped() line to run the test. '.
+        'Remember: Authorization codes expire in 60 seconds and are single-use only!'
+    );
+
+    // WARNING: Replace this with a valid OAuth token to test
+    // Remove it after use to avoid security issues
+    $code = '';
+
+    // Arrange: Create an existing user that should be authenticated
+    $user = User::factory()->create([
+        'metodo_autenticacao' => UserAuthMethod::Google,
+        'google_id' => '101735390619412045443', // Replace with your actual Google ID
+        'email' => 'tccminhasaude2025@gmail.com', // Replace with your actual email
+    ]);
+
+    // Act: Send POST request with real OAuth code
+    $response = $this->postJson(route('auth.login.google'), [
+        'tokenOauth' => $code,
+    ]);
+
+    // Assert: Successful authentication
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'isRegistered',
+            'sessionToken',
+            'registerToken',
+        ])
+        ->assertJson([
+            'isRegistered' => true,
+            'registerToken' => null,
+        ]);
+
+    // Assert: Session token is present
+    expect($response->json('sessionToken'))->not->toBeNull();
+
+    // Assert: User has a new token
+    $user->refresh();
+    expect($user->tokens)->toHaveCount(1);
+
+    // Output for manual verification
+    dump('Session Token: '.$response->json('sessionToken'));
+    dump('User authenticated: '.$user->email);
 });

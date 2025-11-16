@@ -4,21 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('documents', function (Blueprint $table) {
-            $table->id()->autoIncrement();
+            $table->uuid('id')->primary();
             $table->string('titulo');
             $table->string('nome_paciente')->nullable();
             $table->string('nome_medico')->nullable();
             $table->string('tipo_documento')->nullable();
             $table->date('data_documento')->nullable();
-            $table->boolean('is_processing')->default(false); // indica se o documento está sendo processado pela IA
-            $table->string('caminho_arquivo');
+            $table->boolean('is_processing')->default(false);
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete()

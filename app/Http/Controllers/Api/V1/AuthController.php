@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Domain\Actions\Auth\DTO\RegisterFormData;
-use App\Domain\Actions\Auth\EmailLogin;
-use App\Domain\Actions\Auth\GoogleLogin;
-use App\Domain\Actions\Auth\Logout;
-use App\Domain\Actions\Auth\Register;
-use App\Domain\Actions\Auth\RequestVerificationEmail;
-use App\Domain\Exceptions\ExceptionDictionary;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\V1\ReauthenticateRequest;
 use App\Http\Requests\V1\RegisterRequest;
+use App\Modules\User\DTOs\Auth\RegisterFormData;
+use App\Modules\User\UserModule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Log;
@@ -22,7 +18,7 @@ class AuthController extends Controller
      *
      * Etapa intermediária do login via e-mail.
      */
-    public function sendEmail(Request $request, RequestVerificationEmail $requestVerificationEmail)
+    public function sendEmail(Request $request, UserModule $userModule)
     {
         $validated = $request->validate([
             'email' => 'required|email',
@@ -31,10 +27,12 @@ class AuthController extends Controller
         $email = $validated['email'];
 
         // Armazenar no cache por 30 minutos (1800 segundos)
-        $result = $requestVerificationEmail->execute($email);
+        $result = $userModule->requestVerificationEmail($email);
 
         if ($result->isFailure()) {
-            abort(500, 'Unexpected error occoured');
+            $error = $result->tryGetFailure();
+
+            abort($error->code, $error->message);
         }
 
         return response()->json([
@@ -42,7 +40,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function loginEmail(Request $request, EmailLogin $emailLogin)
+    public function loginEmail(Request $request, UserModule $userModule)
     {
         $request->validate([
             'email' => 'required|email',
@@ -53,21 +51,12 @@ class AuthController extends Controller
         $code = $request->codigoEmail;
 
         // Attempt auth
-        $result = $emailLogin->execute($email, $code);
+        $result = $userModule->emailLogin($email, $code);
 
         if ($result->isFailure()) {
             $error = $result->tryGetFailure();
-            $message = $error?->getMessage();
 
-            if ($message === ExceptionDictionary::EMAIL_NOT_FOUND) {
-                abort(400, 'Código de autenticação expirado');
-            }
-
-            if ($message === ExceptionDictionary::INCORRECT_AUTH_CODE) {
-                abort(403, 'Código de autenticação incorreto');
-            }
-
-            abort(500);
+            abort($error->code, $error?->message);
         }
 
         $loginResult = $result->getOrThrow();
@@ -75,36 +64,32 @@ class AuthController extends Controller
         return response()->json($loginResult->toArray());
     }
 
-    public function loginGoogle(Request $request, GoogleLogin $googleLogin)
+    public function loginGoogle(Request $request, UserModule $userModule)
     {
         $request->validate([
             'tokenOauth' => 'required|string',
         ]);
         $token = $request->tokenOauth;
 
-        $loginResult = $googleLogin->execute($token);
+        $loginResult = $userModule->googleLogin($token);
 
         if ($loginResult->isFailure()) {
             $error = $loginResult->tryGetFailure();
-            $message = $error?->getMessage();
 
-            if ($message === ExceptionDictionary::INVALID_OAUTH_TOKEN) {
-                abort(400, ExceptionDictionary::INVALID_OAUTH_TOKEN);
-            } else {
-                abort(500, 'Erro interno no servidor');
-            }
+            abort($error->code, $error->message);
         }
 
         return $loginResult->getOrThrow()->toArray();
     }
 
-    public function logout(Logout $logoutAction)
+    public function logout(UserModule $userModule)
     {
-        $attempt = $logoutAction->execute();
+        $attempt = $userModule->logout();
 
         if ($attempt->isFailure()) {
-            Log::warning('Logout failed: may be no authenticated user, which should be caught by the middleware');
-            abort(403, 'Usuário não autenticado');
+            Log::warning('Logout failed: may be no authenticated user, which should have be caught by the middleware');
+            $error = $attempt->tryGetFailure();
+            abort($error->code, $error->message);
         }
 
         return response()->json([
@@ -112,12 +97,12 @@ class AuthController extends Controller
         ]);
     }
 
-    public function register(RegisterRequest $request, Register $registerAction)
+    public function register(RegisterRequest $request, UserModule $userModule)
     {
         $data = $request->validated();
         $userData = $data['user'];
 
-        $registerResult = $registerAction->execute(new RegisterFormData(
+        $registerResult = $userModule->register(new RegisterFormData(
             nome: $userData['nome'],
             cpf: $userData['cpf'],
             dataNascimento: Carbon::parse($userData['dataNascimento']),
@@ -126,15 +111,32 @@ class AuthController extends Controller
         ));
 
         if ($registerResult->isFailure()) {
-            $error = $registerResult->tryGetFailure()?->getMessage();
-            if ($error === ExceptionDictionary::INVALID_REGISTER_TOKEN) {
-                abort(400, 'Token de registro inválido ou expirado');
-            }
-            abort(500, $error ?? 'Erro interno no servidor');
+            $error = $registerResult->tryGetFailure();
+
+            abort($error->code, $error->message);
         }
 
         $register = $registerResult->getOrThrow();
 
         return $register->toArray();
+    }
+
+    public function reauthenticate(ReauthenticateRequest $request, UserModule $userModule)
+    {
+        $validated = $request->validated();
+
+        $formData = \App\Modules\User\DTOs\Auth\ReauthenticateFormData::fromRequest($validated);
+
+        $result = $userModule->reauthenticate($formData);
+
+        if ($result->isFailure()) {
+            $error = $result->tryGetFailure();
+
+            abort($error->code, $error->message);
+        }
+
+        $reauthResult = $result->getOrThrow();
+
+        return response()->json($reauthResult->toArray());
     }
 }

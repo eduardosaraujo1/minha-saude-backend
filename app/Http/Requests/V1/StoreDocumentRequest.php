@@ -11,7 +11,7 @@ class StoreDocumentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class StoreDocumentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'arquivos' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+            'titulo' => ['nullable', 'string', 'max:255'],
+            'nomePaciente' => ['nullable', 'string', 'max:255'],
+            'nomeMedico' => ['nullable', 'string', 'max:255'],
+            'tipoDocumento' => ['nullable', 'string', 'max:255'],
+            'dataDocumento' => ['nullable', 'date_format:Y-m-d'],
         ];
     }
 }

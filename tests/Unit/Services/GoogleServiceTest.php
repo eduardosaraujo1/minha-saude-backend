@@ -1,6 +1,7 @@
 <?php
 
-use App\Data\Services\Google\GoogleServiceImpl;
+use App\Http\Exceptions\ApiException;
+use App\Modules\User\Services\Adapters\GoogleServiceAdapter;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\GoogleProvider;
 use Mockery\MockInterface;
@@ -39,7 +40,7 @@ test('gets correct data with valid code', function () {
         }));
 
     // Act
-    $googleService = new GoogleServiceImpl;
+    $googleService = new GoogleServiceAdapter;
     $result = $googleService->getUserInfo('valid-auth-code');
 
     // Assert
@@ -69,12 +70,12 @@ test('handles invalid code gracefully', function () {
         ->andReturnSelf();
 
     // Act
-    $googleService = new GoogleServiceImpl;
+    $googleService = new GoogleServiceAdapter;
     $result = $googleService->getUserInfo('invalid-auth-code');
 
     // Assert
     expect($result->isFailure())->toBeTrue();
-    expect($result->tryGetFailure())->toBeInstanceOf(\Exception::class);
+    expect($result->tryGetFailure())->toBeInstanceOf(ApiException::class);
 });
 
 test('integration with real google api', function () {
@@ -89,7 +90,7 @@ test('integration with real google api', function () {
     // Não se esqueça de removê-la após o uso para evitar problemas de segurança
     $code = 'SERVER_AUTHORIZATION_TOKEN';
 
-    $googleService = new GoogleServiceImpl;
+    $googleService = new GoogleServiceAdapter;
     $result = $googleService->getUserInfo($code);
 
     expect($result->isSuccess())->toBeTrue('Expected successful result from GoogleServiceImpl. Got "'.($result->tryGetFailure()?->getMessage()).'".');

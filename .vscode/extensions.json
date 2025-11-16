@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "m1guelpf.better-pest",
+        "devsense.phptools-vscode",
+        "laravel.vscode-laravel",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "qwtel.sqlite-viewer",
+        "bradlc.vscode-tailwindcss",
+        "editorconfig.editorconfig"
+    ]
+}

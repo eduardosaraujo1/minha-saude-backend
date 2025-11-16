@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Data\Models\Document;
-use App\Data\Models\User;
+use App\Modules\Document\Models\Document;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Data\Models\Document>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Modules\Document\Models\Document>
  */
 class DocumentFactory extends Factory
 {
@@ -35,13 +35,13 @@ class DocumentFactory extends Factory
         ];
 
         return [
+            'id' => fake()->uuid(),
             'titulo' => fake()->randomElement($titulos),
             'nome_paciente' => fake()->name(),
             'nome_medico' => 'Dr. '.fake()->name(),
             'tipo_documento' => fake()->randomElement($tiposDocumento),
             'data_documento' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
             'is_processing' => fake()->boolean(20), // 20% chance of being processed
-            'caminho_arquivo' => fake()->filePath(),
             'user_id' => User::factory(),
         ];
     }

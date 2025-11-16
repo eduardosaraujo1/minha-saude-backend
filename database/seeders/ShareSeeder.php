@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Data\Models\Document;
-use App\Data\Models\Share;
-use App\Data\Models\User;
+use App\Modules\Document\Models\Document;
+use App\Modules\Share\Models\Share;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Seeder;
 
 class ShareSeeder extends Seeder
@@ -42,12 +42,6 @@ class ShareSeeder extends Seeder
                 }
             }
         });
-
-        // Create some expired and used shares
-        Share::factory()
-            ->count(3)
-            ->expired()
-            ->create();
 
         Share::factory()
             ->count(5)

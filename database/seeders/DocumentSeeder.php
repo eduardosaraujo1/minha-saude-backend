@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Data\Models\Document;
-use App\Data\Models\User;
+use App\Modules\Document\Models\Document;
+use App\Modules\User\Models\User;
 use Illuminate\Database\Seeder;
 
 class DocumentSeeder extends Seeder

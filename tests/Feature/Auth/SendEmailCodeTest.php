@@ -1,6 +1,6 @@
 <?php
 
-use App\Domain\Mail\AuthVerificationCode;
+use App\Modules\User\Mail\AuthVerificationCode;
 
 /** Business Requirements
  * E-mail content must have code

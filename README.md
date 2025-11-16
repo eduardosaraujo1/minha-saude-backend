@@ -302,6 +302,12 @@ chmod -R 755 storage bootstrap/cache
 
 ---
 
+## Extra: falsificação do export.zip
+
+Após a instalação, coloque um arquivo chamado `export.zip` na pasta `storage/app/private` para que a funcionalidade de exportação funcione corretamente durante o desenvolvimento.
+
+---
+
 ## Pipeline CI/CD
 
 -   [Clique aqui](https://sonarqube.etec.dev.br) para ver o resultado da execução do SonarQube
@@ -352,7 +358,7 @@ O projeto modulariza funcionalidades através da divisão em três camadas, comu
 
 ## Roadmap
 
--   [ ] Implementar funcionalidade de autenticação, começando com google auth test
+-   [ ] Revisar banco de dados e endpoints pra ver se realmente está igual o que o Share Endpoints fala (agora o server deve decidir quando um documento expira e retornar isso pro front)
 
 ## Tutoriais
 

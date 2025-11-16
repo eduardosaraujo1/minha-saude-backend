@@ -1,7 +1,7 @@
 <?php
 
-use App\Data\Models\User;
-use App\Utils\Constants;
+use App\Modules\User\Models\User;
+use App\Modules\User\UserModule;
 
 /** Business Requirements
  * It logs out an authenticated user by invalidating their session token.
@@ -10,7 +10,7 @@ use App\Utils\Constants;
 it('logs out an authenticated user', function () {
     // Arrange: Create and authenticate a user
     $user = User::factory()->create();
-    $token = $user->createToken(Constants::DEFAULT_SANCTUM_TOKEN_NAME)->plainTextToken;
+    $token = $user->createToken(UserModule::DEFAULT_SANCTUM_TOKEN_NAME)->plainTextToken;
 
     // Act: Call the logout endpoint
     $response = $this->withHeaders([
@@ -26,7 +26,7 @@ it('logs out an authenticated user', function () {
     // Assert: Ensure the token is invalidated
     $this->assertDatabaseMissing('personal_access_tokens', [
         'tokenable_id' => $user->id,
-        'name' => Constants::DEFAULT_SANCTUM_TOKEN_NAME,
+        'name' => UserModule::DEFAULT_SANCTUM_TOKEN_NAME,
     ]);
 });
 

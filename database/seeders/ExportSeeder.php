@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Data\Models\Export;
+use App\Modules\Document\Models\Export;
 use Illuminate\Database\Seeder;
 
 class ExportSeeder extends Seeder

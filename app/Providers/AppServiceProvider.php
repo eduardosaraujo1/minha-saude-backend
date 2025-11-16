@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
-use App\Data\Services\Cache\CacheService;
-use App\Data\Services\Google\GoogleService;
+use App\Modules\Document\Services\Adapters\LocalFileStorageAdapter;
+use App\Modules\Document\Services\Ports\FileStoragePort;
+use App\Modules\User\Services\Adapters\CacheServiceAdapter;
+use App\Modules\User\Services\Adapters\GoogleServiceAdapter;
+use App\Modules\User\Services\Ports\CacheServicePort;
+use App\Modules\User\Services\Ports\GoogleServicePort;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,14 +17,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(GoogleService::class,
+        $this->app->singleton(GoogleServicePort::class,
             function ($app) {
-                return new \App\Data\Services\Google\GoogleServiceImpl;
+                return new GoogleServiceAdapter;
             }
         );
 
-        $this->app->singleton(CacheService::class, function ($app) {
-            return new \App\Data\Services\Cache\CacheServiceImpl;
+        $this->app->singleton(CacheServicePort::class, function ($app) {
+            return new CacheServiceAdapter;
+        });
+
+        $this->app->singleton(FileStoragePort::class, function ($app) {
+            return new LocalFileStorageAdapter;
+        });
+
+        $this->app->singleton(\App\Modules\Share\Services\Ports\ShareCodeStorePort::class, function ($app) {
+            return new \App\Modules\Share\Services\Adapters\CacheShareCodeStoreAdapter;
         });
     }
 
