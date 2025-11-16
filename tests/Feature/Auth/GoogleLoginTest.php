@@ -169,3 +169,51 @@ test('validation fails on missing token', function () {
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['tokenOauth']);
 });
+
+test('integration with real google api - existing user', function () {
+    $this->markTestSkipped(
+        'This test requires a fresh OAuth code from the mobile app. '.
+        'Get one using the Flutter app debugger, then replace the $code variable below. '.
+        'Remove this markTestSkipped() line to run the test. '.
+        'Remember: Authorization codes expire in 60 seconds and are single-use only!'
+    );
+
+    // WARNING: Replace this with a valid OAuth token to test
+    // Remove it after use to avoid security issues
+    $code = '';
+
+    // Arrange: Create an existing user that should be authenticated
+    $user = User::factory()->create([
+        'metodo_autenticacao' => UserAuthMethod::Google,
+        'google_id' => '101735390619412045443', // Replace with your actual Google ID
+        'email' => 'tccminhasaude2025@gmail.com', // Replace with your actual email
+    ]);
+
+    // Act: Send POST request with real OAuth code
+    $response = $this->postJson(route('auth.login.google'), [
+        'tokenOauth' => $code,
+    ]);
+
+    // Assert: Successful authentication
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'isRegistered',
+            'sessionToken',
+            'registerToken',
+        ])
+        ->assertJson([
+            'isRegistered' => true,
+            'registerToken' => null,
+        ]);
+
+    // Assert: Session token is present
+    expect($response->json('sessionToken'))->not->toBeNull();
+
+    // Assert: User has a new token
+    $user->refresh();
+    expect($user->tokens)->toHaveCount(1);
+
+    // Output for manual verification
+    dump('Session Token: '.$response->json('sessionToken'));
+    dump('User authenticated: '.$user->email);
+});
