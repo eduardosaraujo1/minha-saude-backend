@@ -10,6 +10,7 @@ use App\Modules\User\Services\Ports\CacheServicePort;
 use App\Modules\User\Services\Ports\GoogleServicePort;
 use App\Modules\User\UserModule;
 use App\Utils\Result;
+use Illuminate\Support\Facades\App;
 use Str;
 
 /**
@@ -30,8 +31,16 @@ class GoogleLogin
     public function execute(string $oauthToken): Result
     {
         try {
-            // Use GoogleService to get e-mail and Google ID from the OAuth token
-            $exchangeResult = $this->googleService->getUserInfo($oauthToken);
+            if (App::environment() !== "production" && $oauthToken === "fake_server_auth_code") {
+                // Simulate a successful response for the fake token
+                $exchangeResult = Result::success((object)[
+                    'googleId' => '1234567898642',
+                    'email' => 'tccminhasaude2025@gmail.com'
+                ]);
+            } else {
+                // Use GoogleService to get e-mail and Google ID from the OAuth token
+                $exchangeResult = $this->googleService->getUserInfo($oauthToken);
+            }
 
             if ($exchangeResult->isFailure()) {
                 return Result::failure(ApiException::invalidOauthToken());
