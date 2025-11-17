@@ -13,9 +13,12 @@ class LocalFileStorageAdapter implements FileStoragePort
      */
     public function store(string $userId, string $documentId, mixed $content): bool
     {
-        $path = $this->buildPath($userId, $documentId);
+        $directory = $userId;
+        $filename = "{$documentId}.pdf";
 
-        return Storage::disk('local')->put($path, $content);
+        $storeResult = Storage::disk('local')->putFileAs($directory, $content, $filename);
+
+        return $storeResult !== false;
     }
 
     public function retrieve(string $userId, string $documentId): ?string

@@ -38,4 +38,9 @@ class ApiException
     {
         return new self('email_not_found', 404);
     }
+
+    public static function cpfAlreadyUsed(): self
+    {
+        return new self('cpf_already_used', 404);
+    }
 }
