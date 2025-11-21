@@ -7,7 +7,7 @@
     @elseif ($documents->isEmpty())
         <div
             class="rounded-2xl border border-dashed border-[#c6c9d4] px-5 py-8 text-center text-sm text-[#5f6473] dark:border-[#3b3d46] dark:text-[#a0a5b8]">
-            {{ __('Nenhum documento disponível para este compartilhamento ainda.') }}
+            {{ __('Nenhum documento disponível para este compartilhamento.') }}
         </div>
     @else
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">

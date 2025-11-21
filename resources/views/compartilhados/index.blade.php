@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 
 <head>
     <meta charset="utf-8">
@@ -7,6 +7,14 @@
     <title>{{ __('Visualizar Compartilhamento') }} • {{ config('app.name') }}</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
+    <script>
+        // Dark mode toggle - follows system preference by default
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
     <style>
         #share-loading-indicator {
             display: none;
@@ -19,15 +27,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="min-h-screen bg-[#f4f6fb] text-[#111322] antialiased dark:bg-[#090b13] dark:text-white">
+<body
+    class="min-h-screen bg-background text-on-background antialiased dark:bg-background-dark dark:text-on-background-dark">
     <div class="flex min-h-screen flex-col">
         <main class="flex-1">
-            <section class="mx-auto w-full max-w-6xl px-6">
+            <section class="mx-auto w-full max-w-6xl px-6 py-2">
                 <div class="flex flex-col gap-3">
-                    <h1 class="text-3xl font-semibold text-[#101225] dark:text-white">
+                    <h1 class="text-3xl font-semibold text-on-background dark:text-on-background-dark">
                         {{ __('Visualizar Compartilhamento') }}
                     </h1>
-                    <p class="text-base text-[#5f6473] dark:text-[#b5bad3]">
+                    <p class="text-base text-on-surface-variant dark:text-on-surface-variant-dark">
                         {{ __('Consulte documentos compartilhados inserindo o código enviado pelo paciente.') }}
                     </p>
                 </div>
@@ -35,20 +44,17 @@
                 <form id="share-search-form" method="GET" action="{{ route('compartilhados.index') }}"
                     hx-get="{{ route('compartilhados.index') }}" hx-target="#share-document-list" hx-swap="innerHTML"
                     hx-push-url="true" hx-indicator="#share-loading-indicator"
-                    class="mt-10 flex flex-col gap-4 rounded-3xl border border-[#dee1f0] bg-white/80 p-6 shadow-sm backdrop-blur dark:border-[#202230] dark:bg-[#111423]">
-                    <label for="share-code-input" class="text-sm font-semibold text-[#363a4d] dark:text-[#c3c8e6]">
-                        {{ __('Código de acesso') }}
-                    </label>
+                    class="mt-2 flex flex-col gap-4 backdrop-blur">
                     <div class="flex flex-col gap-4 md:flex-row md:items-center">
                         <input id="share-code-input" name="code" type="text" maxlength="8" value="{{ $shareCode }}"
                             placeholder="{{ __('Insira o código de acesso') }}"
-                            class="w-full rounded-2xl border border-[#c7cbe0] bg-white/90 px-4 py-3 text-base uppercase tracking-[0.3rem] text-[#101225] placeholder:text-[#9aa0ba] focus:border-[#1f2433] focus:outline-none dark:border-[#2b3045] dark:bg-[#15182a] dark:text-white"
-                            required hx-trigger="keyup changed delay:500ms" hx-get="{{ route('compartilhados.index') }}"
-                            hx-target="#share-document-list" hx-swap="innerHTML" hx-push-url="true"
-                            hx-indicator="#share-loading-indicator" hx-include="#share-search-form" />
+                            class="w-full rounded-2xl border border-outline-variant bg-surface-container-highest px-4 py-3 text-base uppercase tracking-[0.3rem] text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:outline-none dark:border-outline-variant-dark dark:bg-surface-container-highest-dark dark:text-on-surface-dark"
+                            required hx-get="{{ route('compartilhados.index') }}" hx-target="#share-document-list"
+                            hx-swap="innerHTML" hx-push-url="true" hx-indicator="#share-loading-indicator"
+                            hx-include="#share-search-form" />
                         <div class="flex w-full flex-col gap-3 md:w-auto md:flex-row">
                             <button type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1f2433] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#151927] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1f2433] dark:bg-[#6d7bff] dark:hover:bg-[#5560d6]">
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-container hover:text-on-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:bg-primary-dark dark:text-on-primary-dark dark:hover:bg-primary-container-dark dark:hover:text-on-primary-container-dark">
                                 <span class="material-symbols-rounded text-base" aria-hidden="true">search</span>
                                 {{ __('Consultar') }}
                             </button>
@@ -56,13 +62,14 @@
                                 hx-target="#share-document-list" hx-swap="innerHTML" hx-push-url="true"
                                 hx-vals='{"code":""}' hx-indicator="#share-loading-indicator"
                                 hx-on::before-request="document.getElementById('share-code-input').value='';"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-transparent bg-transparent px-6 py-3 text-sm font-semibold text-[#5f6473] transition hover:border-[#d0d4e7] hover:bg-[#eef1fb] hover:text-[#1f2433] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d0d4e7] dark:text-[#b5bad3] dark:hover:border-[#31334b] dark:hover:bg-[#191c2c] dark:focus-visible:outline-[#31334b]">
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-transparent bg-transparent px-6 py-3 text-sm font-semibold text-on-surface-variant transition hover:border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-outline-variant dark:text-on-surface-variant-dark dark:hover:border-outline-variant-dark dark:hover:bg-surface-container-dark dark:focus-visible:outline-outline-variant-dark">
                                 <span class="material-symbols-rounded text-base" aria-hidden="true">backspace</span>
                                 {{ 'Limpar Lista' }}
                             </button>
                         </div>
                     </div>
-                    <div id="share-loading-indicator" class="text-sm text-[#5f6473] dark:text-[#b5bad3]" role="status">
+                    <div id="share-loading-indicator"
+                        class="text-sm text-on-surface-variant dark:text-on-surface-variant-dark" role="status">
                         {{ 'Carregando documentos...' }}
                     </div>
                 </form>
