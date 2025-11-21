@@ -19,7 +19,7 @@ class ViewShareController extends Controller
         $code = $this->normalizeShareCode($request->query('code'));
         $isHtmx = $this->isHtmxRequest($request);
 
-        [$share, $error] = $this->resolveShareByCode($code, $isHtmx);
+        [$share, $error] = $this->resolveShareByCode($code, false);
 
         $documents = $share?->documents ?? collect();
         $viewData = [
@@ -29,9 +29,7 @@ class ViewShareController extends Controller
         ];
 
         if ($isHtmx) {
-            $status = $error ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK;
-
-            return response()->view('compartilhados.partials.partial-thing', $viewData, $status);
+            return response()->view('compartilhados.partials.partial-thing', $viewData);
         }
 
         return view('compartilhados.index', $viewData);

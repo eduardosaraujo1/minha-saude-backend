@@ -54,17 +54,17 @@
                             hx-include="#share-search-form" />
                         <div class="flex w-full flex-col gap-3 md:w-auto md:flex-row">
                             <button type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-container hover:text-on-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:bg-primary-dark dark:text-on-primary-dark dark:hover:bg-primary-container-dark dark:hover:text-on-primary-container-dark">
+                                class="cursor-pointer inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-container hover:text-on-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:bg-primary-dark dark:text-on-primary-dark dark:hover:bg-primary-container-dark dark:hover:text-on-primary-container-dark">
                                 <span class="material-symbols-rounded text-base" aria-hidden="true">search</span>
                                 {{ __('Consultar') }}
                             </button>
                             <button type="button" hx-get="{{ route('compartilhados.index') }}"
                                 hx-target="#share-document-list" hx-swap="innerHTML" hx-push-url="true"
-                                hx-vals='{"code":""}' hx-indicator="#share-loading-indicator"
-                                hx-on::before-request="document.getElementById('share-code-input').value='';"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-transparent bg-transparent px-6 py-3 text-sm font-semibold text-on-surface-variant transition hover:border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-outline-variant dark:text-on-surface-variant-dark dark:hover:border-outline-variant-dark dark:hover:bg-surface-container-dark dark:focus-visible:outline-outline-variant-dark">
+                                hx-indicator="#share-loading-indicator"
+                                hx-on::before-request="document.getElementById('share-code-input').value='';document.getElementById('share-document-list').innerHTML=''"
+                                class="cursor-pointer inline-flex w-max items-center justify-center gap-2 rounded-2xl border border-transparent bg-transparent px-6 py-3 text-sm font-semibold text-on-surface-variant transition hover:border-outline-variant hover:bg-surface-container hover:text-on-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-outline-variant dark:text-on-surface-variant-dark dark:hover:border-outline-variant-dark dark:hover:bg-surface-container-dark dark:focus-visible:outline-outline-variant-dark">
                                 <span class="material-symbols-rounded text-base" aria-hidden="true">backspace</span>
-                                {{ 'Limpar Lista' }}
+                                <span class="w-max">{{ 'Limpar Lista' }}</span>
                             </button>
                         </div>
                     </div>
