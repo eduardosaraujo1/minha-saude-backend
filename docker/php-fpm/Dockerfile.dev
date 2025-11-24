@@ -18,30 +18,30 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # obtain composer using multi-stage build
 # https://docs.docker.com/build/building/multi-stage/
-COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
+# COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
 #Here, we are copying only composer.json and composer.lock (instead of copying the entire source)
 # right before doing composer install.
 # This is enough to take advantage of docker cache and composer install will
 # be executed only when composer.json or composer.lock have indeed changed!-
 # https://medium.com/@softius/faster-docker-builds-with-composer-install-b4d2b15d0fff
-COPY ./www/composer.* ./
+# COPY ./www/composer.* ./
 
 # install
-RUN composer install --prefer-dist --no-dev --no-scripts --no-progress --no-interaction
+# RUN composer install --prefer-dist --no-dev --no-scripts --no-progress --no-interaction
 
 # copy application files to the working directory
-COPY ./www .
+# COPY ./www .
 
 # run composer dump-autoload --optimize
-RUN composer dump-autoload --optimize
+# RUN composer dump-autoload --optimize
 
 # Xdebug has different modes / functionalities. We can default to 'off' and set to 'debug'
 # when we run docker compose up if we need it
 ENV XDEBUG_MODE=off
 
 # Copy xdebug config file into container
-COPY ./php/conf.d/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+COPY ./docker/php-fpm/conf.d/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 # Install xdebug
 RUN set -eux; \
