@@ -1,3 +1,9 @@
+# Stage 1: Build assets
+FROM node:22-alpine AS node_build
+WORKDIR /app
+COPY ./www .
+RUN npm install && npm run build
+
 # Warning: container name in docker-compose.dev.yml must match the stage name below
 # This is necessary so that nginx can reference the correct php-fpm container
 FROM php:8.3-fpm-alpine AS app
@@ -32,6 +38,9 @@ RUN composer install --prefer-dist --no-dev --no-scripts --no-progress --no-inte
 
 # copy application files to the working directory
 COPY ./www .
+
+# Copy built assets from node_build stage
+COPY --from=node_build /app/public/build ./public/build
 
 # run composer dump-autoload --optimize
 RUN composer dump-autoload --optimize

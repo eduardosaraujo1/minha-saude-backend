@@ -13,6 +13,8 @@ services:
     app:
         build:
             dockerfile: ./docker/php-fpm/Dockerfile.dev
+        env_file:
+            - www/.env
         environment:
             APP_NAME: ${APP_NAME}
             APP_ENV: ${APP_ENV}
@@ -31,7 +33,7 @@ services:
             DB_DATABASE: ${DB_DATABASE}
             DB_USERNAME: ${DB_USERNAME}
             DB_PASSWORD: ${DB_PASSWORD}
-            # DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
 
             GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
             GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
@@ -54,12 +56,17 @@ services:
         extra_hosts:
             # Ensure that host.docker.internal is correctly defined on Linux
             - host.docker.internal:host-gateway
+        depends_on:
+            - db
+            - cache
     node:
         image: node:22-alpine
         working_dir: /var/www/html
+        env_file:
+            - www/.env
         volumes:
             - ./www:/var/www/html
-        command: ["npm", "run", "dev"]
+        command: sh -c "npm install && npm run dev"
     # mysql
     db:
         image: mysql:8.0
@@ -68,7 +75,6 @@ services:
             - "./docker/mysql/init:/docker-entrypoint-initdb.d"
         restart: always
         env_file:
-            - .env
             - www/.env
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}

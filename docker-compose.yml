@@ -3,6 +3,8 @@ services:
     web:
         build:
             dockerfile: ./docker/nginx/Dockerfile
+        volumes:
+            - static_assets:/var/www/html/public
         ports:
             - "80:80"
         depends_on:
@@ -10,7 +12,10 @@ services:
     # php
     app:
         build:
-            dockerfile: ./php/Dockerfile
+            dockerfile: ./docker/php-fpm/Dockerfile
+        volumes:
+            - static_assets:/var/www/html/public
+        command: sh -c "php artisan migrate --force && php-fpm"
         environment:
             APP_NAME: ${APP_NAME}
             APP_ENV: ${APP_ENV}
@@ -67,3 +72,6 @@ services:
 
 volumes:
     mysqldata:
+        driver: local
+    static_assets:
+        driver: local
