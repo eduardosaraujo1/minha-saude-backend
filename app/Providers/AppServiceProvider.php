@@ -8,6 +8,7 @@ use App\Modules\User\Services\Adapters\CacheServiceAdapter;
 use App\Modules\User\Services\Adapters\GoogleServiceAdapter;
 use App\Modules\User\Services\Ports\CacheServicePort;
 use App\Modules\User\Services\Ports\GoogleServicePort;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -41,6 +42,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Blade::anonymousComponentPath(resource_path('views/compartilhados/components'), 'compartilhados');
     }
 }

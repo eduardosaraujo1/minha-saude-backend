@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V1;
 
+use App\Http\Exceptions\ApiException;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,6 +32,13 @@ class RegisterRequest extends FormRequest
             'user.dataNascimento' => ['required',  Rule::date()->format('Y-m-d')],
             'user.telefone' => ['required', 'string'],
             'registerToken' => ['required', 'string'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'user.cpf.unique' => ApiException::cpfAlreadyUsed()->message,
         ];
     }
 }

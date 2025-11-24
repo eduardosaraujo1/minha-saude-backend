@@ -79,7 +79,7 @@ class AuthController extends Controller
             abort($error->code, $error->message);
         }
 
-        return $loginResult->getOrThrow()->toArray();
+        return response()->json($loginResult->getOrThrow()->toArray());
     }
 
     public function logout(UserModule $userModule)
@@ -118,7 +118,7 @@ class AuthController extends Controller
 
         $register = $registerResult->getOrThrow();
 
-        return $register->toArray();
+        return response()->json($register->toArray());
     }
 
     public function reauthenticate(ReauthenticateRequest $request, UserModule $userModule)

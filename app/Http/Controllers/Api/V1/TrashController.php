@@ -94,6 +94,7 @@ class TrashController extends Controller
             ->where('user_id', $user->id)
             ->onlyTrashed()
             ->firstOrFail();
+        assert($document instanceof Document);
 
         // Delete the physical file
         $deleted = $this->fileStorage->delete(
@@ -108,7 +109,12 @@ class TrashController extends Controller
         }
 
         // Permanently delete the document record
-        $document->forceDelete();
+        $removedFromDb = $document->forceDelete();
+        if (! $removedFromDb) {
+            $error = ApiException::unexpectedError();
+
+            return response()->json(['message' => $error->message], $error->code);
+        }
 
         return response()->json([]);
     }
