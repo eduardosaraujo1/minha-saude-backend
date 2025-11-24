@@ -1,6 +1,7 @@
 <?php
 
 it('Sends e-mail code and verifies it', function () {
+    $this->markTestSkipped('Not using playground');
     // Send e-mail code
     $response = $this->postJson('/api/v1/auth/send-email', [
         'email' => 'eduardosaraujo100@gmail.com',
