@@ -36,6 +36,7 @@ class CacheServiceAdapter implements CacheServicePort
             return $entry;
         } catch (\Throwable $th) {
             Log::error('Error during cache retrieval: '.$th->getMessage(), [$th]);
+            return null;
         }
     }
 
